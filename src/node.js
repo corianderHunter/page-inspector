@@ -90,17 +90,13 @@ function nodeMutationCollector(mutation) {
       })
       let prevNode = nodesMap_record.get(mutation.previousSibling === 1 ? mutation.previousSibling : (mutation.previousSibling && mutation.previousSibling.previousElementSibling))
       let nextNode = nodesMap_record.get(mutation.nextSibling === 1 ? mutation.nextSibling : (mutation.nextSibling && mutation.nextSibling.nextElementSibling))
-      let parentNode
-      if (!prevNode && !nextNode)
-        parentNode = mutation.target
-
       record({
         type,
+        id,
         removedNodes,
         addedNodes,
         prevNode,
         nextNode,
-        parentNode
       }, recordType)
       break;
     default:
@@ -171,25 +167,26 @@ function recordReplay(data) {
       break;
     case 'childList':
       //remove ndoes and then add nodes
-      target.removedNodes.forEach(val => {
+      data.removedNodes.forEach(val => {
         nodeRemove(nodesMap_replay.get(val))
         nodesMap_replay.delete(val)
       })
       let fragNode = document.createDocumentFragment()
-      target.addedNodes.forEach(val => {
+      data.addedNodes.forEach(val => {
         fragNode.appendChild(plainObjectToDom(val, (node) => {
           nodesMap_replay.set(val.id, node)
         }))
       })
-      if (target.prevNode) {
-
+      let xx = 1
+      if (data.prevNode) {
+        xx--;
+        data.prevNode.after(fragNode)
       }
-      if (target.nextNode) {
-
+      if (xx && data.nextNode) {
+        xx--;
+        data.prevNode.before(fragNode)
       }
-      if (target.target) {
-
-      }
+      xx && target.appendChild(fragNode)
       break;
     case 'input':
       target.value = data.newValue
@@ -218,5 +215,14 @@ export default {
       inputNodeObserverDestory()
       nodeScrollObserverDestory()
     }
+  },
+  replay: {
+    init: initNodesReplayMap,
+    do(records) {
+      records[recordType] && records[recordType].forEach(val => {
+        recordReplay(val)
+      })
+    }
+
   }
 }

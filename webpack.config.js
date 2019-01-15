@@ -2,6 +2,7 @@ const path = require('path')
 const ora = require('ora')
 const chalk = require('chalk')
 const webpack = require('webpack');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 const spinner = ora('building for production...')
 spinner.start()
@@ -31,11 +32,7 @@ function generateConfig(name) {
 
   if (uglify) {
     config.plugins.push(
-      new webpack.optimize.UglifyJsPlugin({
-        compressor: {
-          warnings: false
-        }
-      })
+      new UglifyJSPlugin()
     );
   }
 

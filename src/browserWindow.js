@@ -4,7 +4,8 @@
 
 import {
   globalEventBind,
-  globalEventUnBind
+  globalEventUnBind,
+  isUndef
 } from './utils'
 import {
   throttle
@@ -47,6 +48,11 @@ function windowSizeObserverDestroy() {
   globalEventUnBind('onresize')
 }
 
+let replay = (data) => {
+  window.scrollTo(data.sx, data.sy)
+}
+
+
 export default {
   record: {
     init(_record, _interval) {
@@ -59,5 +65,9 @@ export default {
       scrollObserverDestroy()
       windowSizeObserverDestroy()
     },
+  },
+  replay(record) {
+    let _window = record.window;
+    _window && !isUndef(_window.sx) && !isUndef(_window.sy) && window.scrollTo(_window.sx, _window.sy)
   }
 }

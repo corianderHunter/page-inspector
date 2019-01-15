@@ -289,11 +289,11 @@ function isObject(obj) {
 }
 
 function isPlainObject(obj) {
-  return _toString.call(obj) === '[object Object]'
+  return Object.prototype.toString.call(obj) === '[object Object]'
 }
 
 function isRegExp(v) {
-  return _toString.call(v) === '[object RegExp]'
+  return Object.prototype.toString.call(v) === '[object RegExp]'
 }
 
 function isFunction(v) {
