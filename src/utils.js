@@ -14,8 +14,8 @@ function detect() {
 }
 
 function detectOS(userAgentString) {
-  var rules = getOperatingSystemRules();
-  var detected = rules.filter(function (os) {
+  let rules = getOperatingSystemRules();
+  let detected = rules.filter(function (os) {
     return os.rule && os.rule.test(userAgentString);
   })[0];
 
@@ -23,7 +23,7 @@ function detectOS(userAgentString) {
 }
 
 function getNodeVersion() {
-  var isNode = typeof process !== 'undefined' && process.version;
+  let isNode = typeof process !== 'undefined' && process.version;
   return isNode && {
     name: 'node',
     version: process.version.slice(1),
@@ -32,14 +32,14 @@ function getNodeVersion() {
 }
 
 function parseUserAgent(userAgentString) {
-  var browsers = getBrowserRules();
+  let browsers = getBrowserRules();
   if (!userAgentString) {
     return null;
   }
 
-  var detected = browsers.map(function (browser) {
-    var match = browser.rule.exec(userAgentString);
-    var version = match && match[1].split(/[._]/).slice(0, 3);
+  let detected = browsers.map(function (browser) {
+    let match = browser.rule.exec(userAgentString);
+    let version = match && match[1].split(/[._]/).slice(0, 3);
 
     if (version && version.length < 3) {
       version = version.concat(version.length == 1 ? [0, 0] : [0]);
@@ -183,7 +183,10 @@ function plainObjectToDom(obj, callback) {
             _node.setAttribute(pro, obj.attributes[pro])
           }
         }
-        obj.childNodes && obj.childNodes.forEach(val => _node.appendChild(plainObjectToDom(val, callback)))
+        obj.childNodes && obj.childNodes.forEach(val => {
+          let _dom = plainObjectToDom(val, callback)
+          _dom && _node.appendChild(_dom)
+        })
         break;
       case 2:
         _node = new Text()
@@ -208,7 +211,7 @@ function plainObjectToDom(obj, callback) {
  * code from 'https://gist.github.com/zensh/4975495'
  */
 function memorySizeOf(obj, format) {
-  var bytes = 0;
+  let bytes = 0;
 
   function sizeOf(obj) {
     if (obj !== null && obj !== undefined) {
@@ -223,11 +226,11 @@ function memorySizeOf(obj, format) {
           bytes += 4;
           break;
         case "object":
-          var objClass = Object.prototype.toString
+          let objClass = Object.prototype.toString
             .call(obj)
             .slice(8, -1);
           if (objClass === "Object" || objClass === "Array") {
-            for (var key in obj) {
+            for (let key in obj) {
               if (!obj.hasOwnProperty(key)) continue;
               sizeOf(obj[key]);
             }
@@ -301,6 +304,7 @@ function isFunction(v) {
 };
 
 function nodeRemove(node) {
+  if (!node || !node.nodeType) return
   if (Element.prototype.remove)
     return node.remove()
   if (node.parentNode)

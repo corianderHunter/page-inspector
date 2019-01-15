@@ -167,26 +167,31 @@ function recordReplay(data) {
       break;
     case 'childList':
       //remove ndoes and then add nodes
+      console.log(data);
       data.removedNodes.forEach(val => {
         nodeRemove(nodesMap_replay.get(val))
         nodesMap_replay.delete(val)
       })
       let fragNode = document.createDocumentFragment()
       data.addedNodes.forEach(val => {
-        fragNode.appendChild(plainObjectToDom(val, (node) => {
+        let _dom = plainObjectToDom(val, (node) => {
           nodesMap_replay.set(val.id, node)
-        }))
+        })
+        _dom && fragNode.appendChild(_dom)
       })
       let xx = 1
       if (data.prevNode) {
         xx--;
-        data.prevNode.after(fragNode)
+        let _prevNode = nodesMap_replay.get(data.prevNode)
+        _prevNode && _prevNode.after(fragNode)
       }
       if (xx && data.nextNode) {
         xx--;
-        data.prevNode.before(fragNode)
+        let _nextNode = nodesMap_replay.get(data.nextNode)
+        _nextNode && _nextNode.before(fragNode)
       }
       xx && target.appendChild(fragNode)
+      console.log(fragNode)
       break;
     case 'input':
       target.value = data.newValue
