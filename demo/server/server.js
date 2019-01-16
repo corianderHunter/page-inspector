@@ -31,7 +31,7 @@ app.get('/', function (req, res, next) {
 app.get('/record', function (req, res) {
   let filename = md5(req.query.url) + '.json'
   res.header("Content-Type", 'application/json');
-  res.sendFile(path.join(__dirname, filename));
+  res.sendFile(path.join(__dirname, 'json', filename));
 })
 
 //To receive push request from client
@@ -51,5 +51,5 @@ app.listen(8000, function () {
 
 function writeJson(url, data) {
   let fileName = md5(url) + '.json'
-  fs.writeFileSync(fileName, JSON.stringify(data))
+  fs.writeFileSync('json/' + fileName, JSON.stringify(data))
 }

@@ -1,11 +1,14 @@
 /**
  * mouse
  */
+import {
+  throttle
+} from 'underscore'
 let interval,
   record,
   recordType = ['mouse', 'mouseDown'];
 
-let mouseMove = _.throttle(e => {
+let mouseMove = throttle(e => {
   record({
     mouse: {
       x: e.pageX,
@@ -14,7 +17,7 @@ let mouseMove = _.throttle(e => {
   });
 }, interval);
 
-let mouseDown = _.throttle(e => {
+let mouseDown = throttle(e => {
   record({
     mouseDown: {
       x: e.pageX,

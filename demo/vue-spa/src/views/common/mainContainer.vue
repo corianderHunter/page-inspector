@@ -1,6 +1,8 @@
 <template>
     <el-container class="main-container">
-        <el-header>Header
+        <el-header>
+            Header
+            <input id="input1">
             <el-button type="primary" @click="record">---record---</el-button>
             <el-button type="primary" @click="replay">---replay---</el-button>
         </el-header>
@@ -496,9 +498,28 @@ export default {
         };
     },
     mounted() {
-        // recorder.start();
+        setTimeout(() => {
+            // this.record();
+            // return;
+            fetch
+                .get("/record", {
+                    params: {
+                        url: window.location.href
+                    }
+                })
+                .then(res => {
+                    // console.log(sizeof(res.data));
+                    // console.log(memorySizeOf(res.data));
+                    replay.init(res.data);
+                });
+        }, 1000);
+        // setTimeout(() => {
+        //     console.log(document.querySelectorAll("*"));
+        // }, 3000);
+        return;
         // this.record();
         // return;
+
         fetch
             .get("/record", {
                 params: {
@@ -516,8 +537,6 @@ export default {
         dialogClose() {},
         record() {
             record.init();
-            // recorder.start();
-            // record.init();
         },
         replay() {
             // record.getData()

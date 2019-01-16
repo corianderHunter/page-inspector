@@ -7,6 +7,8 @@ import _replay from './replay'
 
 let units = [node, mouse, browserWindow]
 
+
+
 export let record = {
   ..._record,
   init(interval) {
@@ -22,3 +24,10 @@ export let replay = {
     _replay.init(units, data, startPoint)
   }
 }
+
+window.pageInspector || (function () {
+  window.pageInspector = {
+    record,
+    replay
+  }
+})()

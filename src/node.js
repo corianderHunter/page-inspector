@@ -2,6 +2,7 @@ import {
   domToPlainObject,
   plainObjectToDom,
   isUndef,
+  watchInputNode,
   nodeRemove
 } from "./utils"
 import {
@@ -88,8 +89,21 @@ function nodeMutationCollector(mutation) {
           nodesMap_record.set(node, nodesIdx_record)
         })
       })
-      let prevNode = nodesMap_record.get(mutation.previousSibling === 1 ? mutation.previousSibling : (mutation.previousSibling && mutation.previousSibling.previousElementSibling))
-      let nextNode = nodesMap_record.get(mutation.nextSibling === 1 ? mutation.nextSibling : (mutation.nextSibling && mutation.nextSibling.nextElementSibling))
+      let prevNode, nextNode
+      if (mutation.previousSibling) {
+        if (mutation.previousSibling.nodeType === 1) {
+          prevNode = nodesMap_record.get(mutation.previousSibling)
+        } else {
+          prevNode = nodesMap_record.get(mutation.previousSibling.previousElementSibling)
+        }
+      }
+      if (mutation.nextSibling) {
+        if (mutation.nextSibling.nodeType === 1) {
+          nextNode = nodesMap_record.get(mutation.nextSibling)
+        } else {
+          nextNode = nodesMap_record.get(mutation.nextSibling.nextElementSibling)
+        }
+      }
       record({
         type,
         id,
@@ -105,7 +119,7 @@ function nodeMutationCollector(mutation) {
 }
 
 //<input> <textarea> <select>  input event add mutationObserver
-let inputEvent;
+let watchInput;
 
 function inputMutationCollector(e) {
   record({
@@ -117,10 +131,18 @@ function inputMutationCollector(e) {
 
 function inputNodeObserverInit() {
   document.documentElement.addEventListener('input', inputMutationCollector, false)
+  watchInput = watchInputNode((node) => {
+    record({
+      type: 'input',
+      newValue: node.value,
+      id: nodesMap_record.get(node)
+    }, recordType)
+  })
 }
 
 function inputNodeObserverDestory() {
   document.documentElement.removeEventListener('input', inputMutationCollector, false)
+  watchInput()
 }
 
 //observer the element scroll Event expect the top document
@@ -129,7 +151,7 @@ let scrollEvent;
 function nodeScrollObserverInit() {
   window.addEventListener('scroll', scrollEvent = throttle((e) => {
     let target = e.target;
-    if (e.target === document) return; //the top scroll Event ,see in window.js
+    if (target === document) return; //the top scroll Event ,see in window.js
     record({
       type: 'scroll',
       id: nodesMap_record.get(target),
@@ -144,15 +166,14 @@ function nodeScrollObserverDestory() {
 
 //replay function
 
-let nodesMap_replay = new Map(),
-  nodesIdx_replay;
+let nodesMap_replay = new Map()
 
 function initNodesReplayMap() {
   let nodesArray = document.querySelectorAll('*');
   for (let i = 0; i < nodesArray.length; i++) {
     nodesMap_replay.set(i, nodesArray[i])
   }
-  nodesIdx_replay = nodesMap_replay.size
+  // nodesIdx_replay = nodesMap_replay.size
 }
 
 function recordReplay(data) {
@@ -166,22 +187,21 @@ function recordReplay(data) {
       target.data = data.newValue
       break;
     case 'childList':
-      //remove ndoes and then add nodes
-      console.log(data);
       data.removedNodes.forEach(val => {
         nodeRemove(nodesMap_replay.get(val))
         nodesMap_replay.delete(val)
       })
       let fragNode = document.createDocumentFragment()
       data.addedNodes.forEach(val => {
-        let _dom = plainObjectToDom(val, (node) => {
-          nodesMap_replay.set(val.id, node)
+        let _dom = plainObjectToDom(val, (obj, node) => {
+          nodesMap_replay.set(obj.id, node)
         })
         _dom && fragNode.appendChild(_dom)
       })
       let xx = 1
       if (data.prevNode) {
         xx--;
+        console.log(data, fragNode)
         let _prevNode = nodesMap_replay.get(data.prevNode)
         _prevNode && _prevNode.after(fragNode)
       }
@@ -191,7 +211,6 @@ function recordReplay(data) {
         _nextNode && _nextNode.before(fragNode)
       }
       xx && target.appendChild(fragNode)
-      console.log(fragNode)
       break;
     case 'input':
       target.value = data.newValue

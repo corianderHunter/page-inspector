@@ -170,7 +170,7 @@ function domToPlainObject(node, format) {
   return plainObject
 }
 
-function plainObjectToDom(obj, callback) {
+function plainObjectToDom(obj, callback = () => {}) {
   if (!isPlainObject(obj)) return
   let _node
   try {
@@ -188,7 +188,7 @@ function plainObjectToDom(obj, callback) {
           _dom && _node.appendChild(_dom)
         })
         break;
-      case 2:
+      case 3:
         _node = new Text()
         _node.textContent = obj.textContent
         break;
@@ -202,8 +202,36 @@ function plainObjectToDom(obj, callback) {
   } catch (e) {
     console.error(e)
   }
-  callback(_node)
+  callback(obj, _node)
   return _node;
+}
+
+//watch all of the input value change caused by js code
+function watchInputNode(callback) {
+  function collectAndCheck() {
+    tagNames.forEach(tagName => {
+      nodes = [...nodes, ...document.getElementsByTagName(tagName)]
+    })
+    let newMap = new Map()
+    nodes.forEach(node => {
+      newMap.set(node, node.value || '')
+      let _value = cacheMap.get(node)
+      if (_value !== undefined) {
+        _value === node.value ? null : callback(node)
+      }
+    })
+    cacheMap = newMap
+  }
+  let tagNames = ['INPUT', 'TEXTAREA', 'SELECT'],
+    nodes = [],
+    cacheMap = new Map()
+  collectAndCheck()
+  let _timer = setInterval(function () {
+    collectAndCheck()
+  }, 300)
+  return function () {
+    clearInterval(_timer)
+  }
 }
 
 /** memorySizeOf*/
@@ -327,6 +355,7 @@ export {
   isFunction,
   domToPlainObject,
   plainObjectToDom,
+  watchInputNode,
   memorySizeOf,
   nodeRemove
 };

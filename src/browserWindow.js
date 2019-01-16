@@ -34,7 +34,7 @@ function scrollObserverDestroy() {
 
 function windowSizeObserverInit() {
   //it my be overwrite
-  globalEventBind('onresize', _.throttle(() => {
+  globalEventBind('onresize', throttle(() => {
     record({
       window: {
         w: window.innerWidth,
