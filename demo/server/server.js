@@ -4,8 +4,10 @@ let path = require('path')
 
 let md5 = require('md5');
 let express = require('express');
+let httpProxy = require('http-proxy');
 let bodyParser = require('body-parser');
 let app = express();
+let md5Map = require('./md5Map.json');
 
 app.use(bodyParser.urlencoded({
   extended: false
@@ -34,6 +36,21 @@ app.get('/record', function (req, res) {
   res.sendFile(path.join(__dirname, 'json', filename));
 })
 
+app.get('/pageList', function (req, res) {
+  let folder = 'json'
+  fs.readdir(folder, function (e, files) {
+    if (e)
+      return res.status(400).send(e)
+    res.send(files.map(file => {
+      let md5Name = file.split('.')[0]
+      return {
+        url: md5Map[md5Name],
+        fileName: file
+      }
+    }))
+  })
+})
+
 //To receive push request from client
 app.post('/record', function (req, res) {
   let {
@@ -50,6 +67,10 @@ app.listen(8000, function () {
 
 
 function writeJson(url, data) {
-  let fileName = md5(url) + '.json'
+  let urlMD5 = md5(url)
+  let fileName = urlMD5 + '.json'
+  md5Map[urlMD5] = url
+  fs.writeFileSync('md5Map.json', JSON.stringify(md5Map))
   fs.writeFileSync('json/' + fileName, JSON.stringify(data))
+
 }

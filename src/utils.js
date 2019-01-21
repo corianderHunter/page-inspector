@@ -136,7 +136,7 @@ function buildRules(ruleTuples) {
  * @param {*} node 
  * @returns {Array} arr
  */
-function domToPlainObject(node, format) {
+function domToPlainObject(node, format = () => {}) {
   /**
    * Node Types:
    * Node.ELEMENT_NODE  1   An Element node such as <p> or <div>
@@ -151,6 +151,7 @@ function domToPlainObject(node, format) {
   }
   switch (node.nodeType) {
     case 1:
+    case 9:
       plainObject.tagName = node.tagName;
       if (node.attributes.length) {
         let attributes = plainObject.attributes = {}
@@ -176,6 +177,7 @@ function plainObjectToDom(obj, callback = () => {}) {
   try {
     switch (obj.nodeType) {
       case 1:
+      case 9:
         _node = document.createElement(obj.tagName)
         if (!_node) return;
         if (obj.attributes) {

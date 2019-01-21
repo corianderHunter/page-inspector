@@ -20,8 +20,8 @@ export let record = {
 }
 
 export let replay = {
-  init(data, startPoint = 0) {
-    _replay.init(units, data, startPoint)
+  play(data, startPoint = 0) {
+    _replay.play(units, data, startPoint)
   }
 }
 

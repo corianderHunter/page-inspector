@@ -1,7 +1,9 @@
 <template>
     <div class="replayer-client">
         <div class="left">
-            <div class="left-header"></div>
+            <div class="left-header">
+                <el-button @click="isPlay?play():pause()">{{isPlaying?'pause':'play'}}</el-button>
+            </div>
             <div class="iframe-div">
                 <iframe
                     ref="iframe"
@@ -23,11 +25,18 @@ let url = "http://localhost:8080/#/";
 
 export default {
     frameWindow: null,
+    data() {
+        return {
+            isPlaying: false
+        };
+    },
     mounted() {
         this.$options.frameWindow = this.$refs.iframe.contentWindow;
         this.getPageList();
     },
     methods: {
+        play() {},
+        pause() {},
         frameOk() {
             this.$options.frameWindow.postMessage(
                 "hello",
