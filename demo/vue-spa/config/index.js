@@ -5,10 +5,11 @@
 const path = require('path')
 const devEnv = require('./dev.env')
 
+const {
+  proxyPort
+} = require('../../server/const')
 
-
-
-
+const proxyServer = 'http://' + 'localhost:' + proxyPort
 
 module.exports = {
   dev: {
@@ -17,9 +18,12 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/': {
+      '/api': {
         target: JSON.parse(devEnv.BASE_API),
         changeOrigin: true,
+        pathRewrite: {
+          '^/api': ''
+        }
       },
     },
 

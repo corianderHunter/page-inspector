@@ -3,7 +3,12 @@
         <div class="left">
             <div class="left-header"></div>
             <div class="iframe-div">
-                <iframe ref="iframe" src="/#/"></iframe>
+                <iframe
+                    ref="iframe"
+                    sandbox="allow-same-origin allow-scripts"
+                    @load="frameOk"
+                    src="/#/"
+                ></iframe>
             </div>
         </div>
         <div class="right"></div>
@@ -11,11 +16,29 @@
 </template>
 
 <script>
-import testData from './test.json'
+import testData from "./test.json";
+import fetch from "@utils/fetch";
+
+let url = "http://localhost:8080/#/";
+
 export default {
     frameWindow: null,
     mounted() {
         this.$options.frameWindow = this.$refs.iframe.contentWindow;
+        this.getPageList();
+    },
+    methods: {
+        frameOk() {
+            this.$options.frameWindow.postMessage(
+                "hello",
+                "http://127.0.0.1:5500"
+            );
+        },
+        getPageList() {
+            fetch.get("/pageList").then(res => {
+                console.log(res);
+            });
+        }
     }
 };
 </script>

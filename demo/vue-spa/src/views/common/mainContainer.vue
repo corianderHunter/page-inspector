@@ -461,7 +461,7 @@ import fetch from "@utils/fetch";
 // import { record } from "@utils/page-recorder/lib/rebuild";
 // import { isPlainObject } from "@utils/page-recorder/lib/rebuild/utils";
 import { record, replay } from "@/../../../src";
-
+import { domToPlainObject } from "@/../../../src/utils";
 export default {
     data() {
         return {
@@ -498,7 +498,10 @@ export default {
         };
     },
     mounted() {
+        // console.log(domToPlainObject(document.documentElement));
+        // console.log(JSON.stringify(domToPlainObject(document.documentElement)));
         setTimeout(() => {
+            // // noScript();
             // this.record();
             // return;
             fetch
@@ -510,7 +513,7 @@ export default {
                 .then(res => {
                     // console.log(sizeof(res.data));
                     // console.log(memorySizeOf(res.data));
-                    replay.init(res.data);
+                    replay.play(res.data, 400);
                 });
         }, 1000);
         // setTimeout(() => {
@@ -519,18 +522,6 @@ export default {
         return;
         // this.record();
         // return;
-
-        fetch
-            .get("/record", {
-                params: {
-                    url: window.location.href
-                }
-            })
-            .then(res => {
-                // console.log(sizeof(res.data));
-                // console.log(memorySizeOf(res.data));
-                replay.init(res.data);
-            });
     },
     methods: {
         initRecorder() {},
