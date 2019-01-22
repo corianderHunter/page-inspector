@@ -2,7 +2,12 @@
     <div class="replayer-client">
         <div class="left">
             <div class="left-header">
-                <el-button @click="isPlay?play():pause()">{{isPlaying?'pause':'play'}}</el-button>
+                min:{{0}}
+                max:{{100}}
+                <el-button
+                    @click="isPlaying=!isPlaying;isPlay?play(0):pause()"
+                >{{isPlaying?'pause':'play'}}</el-button>
+                <el-input style="width:80px" v-model="timePoint"></el-input>
             </div>
             <div class="iframe-div">
                 <iframe
@@ -21,31 +26,43 @@
 import testData from "./test.json";
 import fetch from "@utils/fetch";
 
-let url = "http://localhost:8080/#/";
+let url = new URL("http://localhost:8080/#/");
 
 export default {
     frameWindow: null,
     data() {
         return {
-            isPlaying: false
+            isPlaying: false,
+            timePoint: 0,
+            interval: null,
+            records: null,
+            pageList: []
         };
     },
     mounted() {
         this.$options.frameWindow = this.$refs.iframe.contentWindow;
-        this.getPageList();
     },
     methods: {
         play() {},
         pause() {},
         frameOk() {
-            this.$options.frameWindow.postMessage(
-                "hello",
-                "http://127.0.0.1:5500"
-            );
+            this.getRecords().then(res => {
+                this.interval = res.data.interval;
+                this.records = res.data.records;
+                this.$options.frameWindow.postMessage(
+                    {
+                        type: "INSPECTOR",
+                        records: this.records
+                    },
+                    url.origin
+                );
+            });
         },
-        getPageList() {
-            fetch.get("/pageList").then(res => {
-                console.log(res);
+        getRecords() {
+            return fetch.get("/record", {
+                params: {
+                    url: url.href
+                }
             });
         }
     }

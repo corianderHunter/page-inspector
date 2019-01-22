@@ -12,7 +12,7 @@ let interval,
     funcMap = new Map(),
     timerMap = new Map();
 
-let init = (consumers, data, _startPoint = 0) => {
+let init = (_startPoint = 0, consumers, data, ) => {
     if (isEmpty(data) || isEmpty(data.records))
         return console.error('record data is empty');
     startPoint = _startPoint;
@@ -37,6 +37,7 @@ let init = (consumers, data, _startPoint = 0) => {
             });
         });
     }
+    play()
 };
 
 let play = (currPoint = startPoint) => {
@@ -45,10 +46,9 @@ let play = (currPoint = startPoint) => {
             timerMap.set(
                 timePoint - 0,
                 setTimeout(() => {
-                    funcMap[timePoint]();
+                    funcMap.get(timePoint);
                     timerMap.delete(timePoint);
-                }, (timePoint - currPoint) * interval)
-            );
+                }, (timePoint - currPoint) * interval));
     }
 };
 
@@ -58,24 +58,8 @@ let stop = currPoint => {
     }
 };
 
-let actions = {
+export default {
     init,
     play,
     stop
 };
-
-let postMessageInit = (function () {
-    window.addEventListener('message', e => {
-        /** safety check */
-        /** safety check */
-        let _data = e.data;
-        let action, startPoint, data;
-        action = _data.action;
-        startPoint = _data.startPoint;
-        data = _data.data;
-        actions[_data.action] && actions[_data.action](_data.data);
-    });
-})();
-//
-
-export default {};

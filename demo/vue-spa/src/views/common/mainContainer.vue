@@ -500,6 +500,10 @@ export default {
     mounted() {
         // console.log(domToPlainObject(document.documentElement));
         // console.log(JSON.stringify(domToPlainObject(document.documentElement)));
+        window.addEventListener("message", e => {
+            console.log(e);
+        });
+        return;
         setTimeout(() => {
             // // noScript();
             // this.record();

@@ -21,9 +21,24 @@ export let record = {
 
 export let replay = {
   play(data, startPoint = 0) {
-    _replay.play(units, data, startPoint)
+    _replay.init(startPoint, units, data, )
   }
 }
+
+
+window.addEventListener('message', e => {
+  /** safety check */
+  /** safety check */
+  let _data = e.data;
+  if (isEmpty(_data)) return;
+  if (_data.type !== 'INSPECTOR') return;
+  let {
+    action,
+    timePoint = 0,
+    data
+  } = _data;
+  _replay[action] && actions[action](timePoint, units, data);
+});
 
 window.pageInspector || (function () {
   window.pageInspector = {
