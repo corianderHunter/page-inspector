@@ -12,7 +12,7 @@ let interval,
     funcMap = new Map(),
     timerMap = new Map();
 
-let init = (_startPoint = 0, consumers, data, ) => {
+let init = (_startPoint = 0, consumers, data) => {
     if (isEmpty(data) || isEmpty(data.records))
         return console.error('record data is empty');
     startPoint = _startPoint;
@@ -25,7 +25,7 @@ let init = (_startPoint = 0, consumers, data, ) => {
             return val.replay.do;
         }) || [];
     for (let timePoint in records) {
-        if (timePoint - 0 <= startPoint) {
+        if ((timePoint - 0) <= startPoint) {
             replayers.forEach(func => {
                 func(data.records[timePoint]);
             });
@@ -41,20 +41,22 @@ let init = (_startPoint = 0, consumers, data, ) => {
 };
 
 let play = (currPoint = startPoint) => {
-    for (let timePoint in funcMap) {
-        if (timePoint >= currPoint)
+    for (let [timePoint, timeFunc] of funcMap) {
+        if (timePoint >= currPoint) {
             timerMap.set(
                 timePoint - 0,
                 setTimeout(() => {
-                    funcMap.get(timePoint);
+                    timeFunc.call(null);
                     timerMap.delete(timePoint);
                 }, (timePoint - currPoint) * interval));
+        }
+
     }
 };
 
 let stop = currPoint => {
-    for (timePoint in timerMap) {
-        clearInterval(timerMap.get(timePoint));
+    for (let timeFunc of timerMap.values()) {
+        clearInterval(timeFunc);
     }
 };
 

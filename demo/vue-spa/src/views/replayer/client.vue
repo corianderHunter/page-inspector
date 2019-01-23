@@ -4,16 +4,15 @@
             <div class="left-header">
                 min:{{0}}
                 max:{{100}}
-                <el-button
-                    @click="isPlaying=!isPlaying;isPlay?play(0):pause()"
-                >{{isPlaying?'pause':'play'}}</el-button>
+                <el-button @click="isPlaying?pause():play()">{{isPlaying?'pause':'play'}}</el-button>
                 <el-input style="width:80px" v-model="timePoint"></el-input>
+                <el-button @click="frameReload">fresh iframe</el-button>
             </div>
             <div class="iframe-div">
                 <iframe
+                    v-if="isReady"
                     ref="iframe"
                     sandbox="allow-same-origin allow-scripts"
-                    @load="frameOk"
                     src="/#/"
                 ></iframe>
             </div>
@@ -36,34 +35,78 @@ export default {
             timePoint: 0,
             interval: null,
             records: null,
-            pageList: []
+            pageList: [],
+            isReady: false,
+            startTime: null
         };
     },
     mounted() {
-        this.$options.frameWindow = this.$refs.iframe.contentWindow;
+        this.getRecords();
+        this.startTime = Date.now();
+        window.addEventListener("message", e => {
+            if (e.data === "INSPECTOR_READY") {
+                this.frameOk();
+            }
+        });
+    },
+    watch: {
+        timePoint(val) {
+            this.startTime = val - 0;
+            this.$refs.iframe.contentWindow.location.reload();
+        }
     },
     methods: {
-        play() {},
-        pause() {},
-        frameOk() {
-            this.getRecords().then(res => {
-                this.interval = res.data.interval;
-                this.records = res.data.records;
-                this.$options.frameWindow.postMessage(
-                    {
-                        type: "INSPECTOR",
-                        records: this.records
-                    },
-                    url.origin
-                );
+        play() {
+            this.isPlaying = !this.isPlaying;
+            this.$refs.iframe.contentWindow.postMessage({
+                type: "INSPECTOR",
+                action: "play",
+                timePoint: this.actTime
             });
         },
-        getRecords() {
-            return fetch.get("/record", {
-                params: {
-                    url: url.href
-                }
+        pause() {
+            this.isPlaying = !this.isPlaying;
+            this.$refs.iframe.contentWindow.postMessage({
+                type: "INSPECTOR",
+                action: "stop",
+                timePoint: (this.actTime = this.getCurrTime())
             });
+        },
+        frameReload() {
+            this.$refs.iframe.contentWindow.location.reload();
+        },
+        getCurrTime(startTime = this.startTime, interval = this.interval) {
+            return Math.floor((Date.now() - startTime) / interval) - 0;
+        },
+        frameOk() {
+            this.isPlaying = true;
+            !this.startTime && (this.startTime = 0);
+            this.$refs.iframe.contentWindow.postMessage(
+                {
+                    type: "INSPECTOR",
+                    action: "init",
+                    timePoint: this.startTime,
+                    data: {
+                        interval: this.interval,
+                        records: this.records
+                    }
+                },
+                url.origin
+            );
+        },
+        getRecords() {
+            return fetch
+                .get("/record", {
+                    params: {
+                        url: url.href
+                    }
+                })
+                .then(res => {
+                    this.isReady = true;
+                    this.interval = res.data.interval;
+                    this.records = res.data.records;
+                    return res.data;
+                });
         }
     }
 };

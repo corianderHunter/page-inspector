@@ -498,16 +498,11 @@ export default {
         };
     },
     mounted() {
-        // console.log(domToPlainObject(document.documentElement));
-        // console.log(JSON.stringify(domToPlainObject(document.documentElement)));
-        window.addEventListener("message", e => {
-            console.log(e);
-        });
-        return;
+        // this.record();
         setTimeout(() => {
             // // noScript();
-            // this.record();
-            // return;
+            this.record();
+            return;
             fetch
                 .get("/record", {
                     params: {
@@ -520,12 +515,6 @@ export default {
                     replay.play(res.data, 400);
                 });
         }, 1000);
-        // setTimeout(() => {
-        //     console.log(document.querySelectorAll("*"));
-        // }, 3000);
-        return;
-        // this.record();
-        // return;
     },
     methods: {
         initRecorder() {},
@@ -534,11 +523,6 @@ export default {
             record.init();
         },
         replay() {
-            // record.getData()
-
-            console.log(record.getData());
-            // console.log(memorySizeOf(record.getData(), "MB"));
-            // console.log(memorySizeOf(JSON.stringify(getData()), "MB"));
             fetch.post("/record", {
                 url: window.location.href,
                 records: record.getData()
