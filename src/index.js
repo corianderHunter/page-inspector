@@ -32,6 +32,7 @@ window.addEventListener('message', e => {
   let _data = e.data;
   if (isEmpty(_data)) return;
   if (_data.type !== 'INSPECTOR') return;
+  if (_record.status) _record.destroy();
   let {
     action,
     timePoint = 0,

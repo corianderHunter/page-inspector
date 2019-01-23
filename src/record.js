@@ -1,6 +1,7 @@
 let records = {},
   recordStart,
-  interval
+  interval,
+  status
 
 function takeRecord(data, prop) {
   let timeKey = Math.floor((Date.now() - recordStart) / interval);
@@ -21,11 +22,13 @@ export function init(producers, _interval = 50) {
   interval = _interval
   recordStart = Date.now();
   producers.forEach(val => val.record.init(takeRecord, interval))
+  status = true;
 }
 
 
 export function destroy(producers) {
   producers.forEach(val => val.record.destroy(interval))
+  status = false
 }
 
 export function getData() {
@@ -38,6 +41,7 @@ export function getData() {
 
 export default {
   init,
+  status,
   destroy,
   getData
 }

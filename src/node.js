@@ -201,7 +201,6 @@ function recordReplay(data) {
       let xx = 1
       if (data.prevNode) {
         xx--;
-        console.log(data, fragNode)
         let _prevNode = nodesMap_replay.get(data.prevNode)
         _prevNode && _prevNode.after(fragNode)
       }
@@ -220,8 +219,6 @@ function recordReplay(data) {
       break;
   }
 }
-
-
 
 
 export default {
