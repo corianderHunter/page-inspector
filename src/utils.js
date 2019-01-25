@@ -236,6 +236,10 @@ function watchInputNode(callback) {
   }
 }
 
+function urlIsAbsolute(url) {
+  return /^(?:[a-z]+:)?\/\//i.test(url)
+}
+
 /** memorySizeOf*/
 /**
  * code from 'https://gist.github.com/zensh/4975495'
@@ -341,6 +345,22 @@ function nodeRemove(node) {
     return node.parentNode.removeChild(node)
 }
 
+const networkAttributes = ['src', 'href']
+
+function formatUrlAttributes(attrs) {
+  if (!attrs) return
+  networkAttributes.forEach(val => {
+    if (attrs[val] && !urlIsAbsolute(attrs[val])) {
+      try {
+        attrs[val] = (new URL(attrs[val], window.location.origin)).href
+        return attrs
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  })
+}
+
 export {
   isBrowser,
   isNode,
@@ -358,6 +378,8 @@ export {
   domToPlainObject,
   plainObjectToDom,
   watchInputNode,
+  urlIsAbsolute,
   memorySizeOf,
-  nodeRemove
+  nodeRemove,
+  formatUrlAttributes
 };

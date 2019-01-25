@@ -525,7 +525,8 @@ export default {
         replay() {
             fetch.post("/record", {
                 url: window.location.href,
-                records: record.getData()
+                dom: record.getDomObject(),
+                records: record.getRecords()
             });
         }
     }

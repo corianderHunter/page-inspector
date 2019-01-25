@@ -1,7 +1,12 @@
+import {
+  pageCollector
+} from './page'
+
 let records = {},
   recordStart,
   interval,
-  status
+  status,
+  pageCollection
 
 function takeRecord(data, prop) {
   let timeKey = Math.floor((Date.now() - recordStart) / interval);
@@ -19,19 +24,33 @@ function takeRecord(data, prop) {
 
 
 export function init(producers, _interval = 50) {
+  status = true;
   interval = _interval
   recordStart = Date.now();
+  pageCollection = pageCollector();
   producers.forEach(val => val.record.init(takeRecord, interval))
-  status = true;
 }
-
 
 export function destroy(producers) {
   producers.forEach(val => val.record.destroy(interval))
   status = false
 }
 
-export function getData() {
+export function getDomObject() {
+  if (!status)
+    return console.warn('recorder is not inited')
+  return pageCollection.domObject
+}
+
+export function getDomMap() {
+  if (!status)
+    return console.warn('recorder is not inited')
+  return pageCollection.domMap
+}
+
+export function getRecords() {
+  if (!status)
+    return console.warn('recorder is not inited')
   return {
     interval,
     records
@@ -43,5 +62,6 @@ export default {
   init,
   status,
   destroy,
-  getData
+  getDomObject,
+  getRecords
 }

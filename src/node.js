@@ -6,23 +6,23 @@ import {
   nodeRemove
 } from "./utils"
 import {
+  getDomMap
+} from './record'
+import {
   throttle
 } from 'underscore'
 
 
 let interval = 50, //the minimum time interval,
   record,
-  nodesMap_record = new Map(),
+  nodesMap_record,
   recordType = 'nodes',
   nodesIdx_record;
 
 //add all nodes(nodeType is Node.ELEMENT_NODE=1) into a Map for record,
 function initNodesRecordMap() {
-  let nodesArray = document.querySelectorAll('*');
-  for (let i = 0; i < nodesArray.length; i++) {
-    nodesMap_record.set(nodesArray[i], i)
-  }
-  nodesIdx_record = nodesMap_record.size + 100
+  nodesMap_record = getDomMap()
+  nodesIdx_record = nodesMap_record.size;
 }
 
 //use MutationObserver to observer all of the node mutations 

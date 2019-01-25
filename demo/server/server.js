@@ -55,9 +55,13 @@ app.get('/pageList', function (req, res) {
 app.post('/record', function (req, res) {
   let {
     url,
-    records
+    records,
+    dom
   } = req.body
-  writeJson(url, records)
+  writeJson(url, {
+    dom,
+    records
+  })
   res.send(req.body)
 });
 
