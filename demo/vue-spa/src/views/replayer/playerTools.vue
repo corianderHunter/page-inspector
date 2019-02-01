@@ -1,10 +1,15 @@
-<template></template>
+<template>
+    <play-tools></play-tools>
+</template>
 
 <script>
+import playTools from "@components/playTools";
 export default {
-    props: {}
+    components: {
+        playTools
+    }
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 </style>

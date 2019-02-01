@@ -40,7 +40,6 @@ class Service {
         let _args, customMessage;
         _args = Object.assign(pick(val, axiosRequestConfigs), arguments[0]);
         _args['url'] = handlerUrlParams(_args['url'], _args['urlParams']);
-
         customMessage = _args['customMessage'];
         return fetch(_args).then(res => {
           if (!customMessage && self.defaults.method !== 'get') {

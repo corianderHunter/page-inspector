@@ -460,7 +460,8 @@ import sizeof from "object-sizeof";
 import fetch from "@utils/fetch";
 // import { record } from "@utils/page-recorder/lib/rebuild";
 // import { isPlainObject } from "@utils/page-recorder/lib/rebuild/utils";
-import { record, replay } from "@/../../../src";
+// import record from "@/../../../src/record";
+import record from "@/../../../dist/page-record";
 import { domToPlainObject } from "@/../../../src/utils";
 export default {
     data() {

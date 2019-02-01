@@ -3,14 +3,15 @@ import {
   plainObjectToDom,
   isUndef,
   watchInputNode,
-  nodeRemove
-} from "./utils"
+  nodeRemove,
+  throttle
+} from "../utils"
 import {
   getDomMap
-} from './record'
+} from '../record'
 import {
-  throttle
-} from 'underscore'
+  getNodesMap
+} from '../page'
 
 
 let interval = 50, //the minimum time interval,
@@ -149,7 +150,7 @@ function inputNodeObserverDestory() {
 let scrollEvent;
 
 function nodeScrollObserverInit() {
-  window.addEventListener('scroll', scrollEvent = throttle((e) => {
+  window.addEventListener('scroll', scrollEvent = throttle(interval, (e) => {
     let target = e.target;
     if (target === document) return; //the top scroll Event ,see in window.js
     record({
@@ -157,7 +158,7 @@ function nodeScrollObserverInit() {
       id: nodesMap_record.get(target),
       newValue: [target.scrollLeft, target.scrollTop]
     }, recordType)
-  }, interval), true)
+  }), true)
 }
 
 function nodeScrollObserverDestory() {
@@ -165,18 +166,10 @@ function nodeScrollObserverDestory() {
 }
 
 //replay function
-
-let nodesMap_replay = new Map()
-
-function initNodesReplayMap() {
-  let nodesArray = document.querySelectorAll('*');
-  for (let i = 0; i < nodesArray.length; i++) {
-    nodesMap_replay.set(i, nodesArray[i])
-  }
-  // nodesIdx_replay = nodesMap_replay.size
-}
+let self
 
 function recordReplay(data) {
+  let nodesMap_replay = getNodesMap();
   let target = nodesMap_replay.get(data.id)
   if (isUndef(target)) return;
   switch (data.type) {
@@ -191,9 +184,9 @@ function recordReplay(data) {
         nodeRemove(nodesMap_replay.get(val))
         nodesMap_replay.delete(val)
       })
-      let fragNode = document.createDocumentFragment()
+      let fragNode = self.document.createDocumentFragment()
       data.addedNodes.forEach(val => {
-        let _dom = plainObjectToDom(val, (obj, node) => {
+        let _dom = plainObjectToDom(val, self, (obj, node) => {
           nodesMap_replay.set(obj.id, node)
         })
         _dom && fragNode.appendChild(_dom)
@@ -237,13 +230,12 @@ export default {
       nodeScrollObserverDestory()
     }
   },
-  replay: {
-    init: initNodesReplayMap,
-    do(records) {
-      records[recordType] && records[recordType].forEach(val => {
-        recordReplay(val)
-      })
-    }
-
+  replay(records, _self = window) {
+    self = _self
+    records[recordType] && records[recordType].forEach(val => {
+      recordReplay(val)
+    })
   }
+
+
 }

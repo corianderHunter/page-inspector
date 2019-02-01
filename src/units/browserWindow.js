@@ -5,19 +5,17 @@
 import {
   globalEventBind,
   globalEventUnBind,
-  isUndef
-} from './utils'
-import {
+  isUndef,
   throttle
-} from 'underscore'
+} from '../utils'
 
-let interval = 30,
+let self, interval = 30,
   record;
 
 let scrollEvent;
 
 function scrollObserverInit() {
-  window.addEventListener('scroll', scrollEvent = throttle((e) => {
+  window.addEventListener('scroll', scrollEvent = throttle(interval, (e) => {
     if (e.target !== document) return;
     record({
       window: {
@@ -25,7 +23,7 @@ function scrollObserverInit() {
         sy: window.scrollY
       }
     })
-  }, interval), true)
+  }), true)
 }
 
 function scrollObserverDestroy() {
@@ -34,22 +32,18 @@ function scrollObserverDestroy() {
 
 function windowSizeObserverInit() {
   //it my be overwrite
-  globalEventBind('onresize', throttle(() => {
+  globalEventBind('onresize', throttle(interval, () => {
     record({
       window: {
         w: window.innerWidth,
         h: window.innerHeight,
       }
     })
-  }, interval))
+  }))
 }
 
 function windowSizeObserverDestroy() {
   globalEventUnBind('onresize')
-}
-
-let replay = (data) => {
-  window.scrollTo(data.sx, data.sy)
 }
 
 
@@ -66,8 +60,9 @@ export default {
       windowSizeObserverDestroy()
     },
   },
-  replay(record) {
+  replay(record, _self = window) {
+    self = _self
     let _window = record.window;
-    _window && !isUndef(_window.sx) && !isUndef(_window.sy) && window.scrollTo(_window.sx, _window.sy)
+    _window && !isUndef(_window.sx) && !isUndef(_window.sy) && self.scrollTo(_window.sx, _window.sy)
   }
 }

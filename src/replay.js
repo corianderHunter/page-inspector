@@ -1,67 +1,71 @@
 import {
     isEmpty
-} from 'underscore';
+} from './utils'
 import {
-    isFunction
-} from './utils';
+    pageRender
+} from './page'
+import node from './units/node'
+import mouse from './units/mouse'
+import browserWindow from './units/browserWindow'
 
-let interval,
-    records,
-    startPoint,
-    replayers,
-    funcMap = new Map(),
-    timerMap = new Map();
+let self, records, domObj, interval, replayers;
 
-let init = (_startPoint = 0, consumers, data) => {
-    if (isEmpty(data) || isEmpty(data.records))
-        return console.error('record data is empty');
-    startPoint = _startPoint;
-    interval = data.interval;
-    records = data.records;
-    replayers =
-        consumers.map(val => {
-            if (isFunction(val.replay)) return val.replay;
-            val.replay.init();
-            return val.replay.do;
-        }) || [];
+let consumers = [node, mouse, browserWindow]
+
+function getReplayers() {
+    return consumers.map(val => val.replay) || []
+}
+
+
+function init(_self, _dom, data) {
+    self = _self
+    domObj = _dom
+    records = data.records
+    interval = data.interval
+    if (!records || isEmpty(records)) return
+    replayers = getReplayers()
+    buildFuncMap()
+    play(0, true)
+}
+
+let funcMap = new Map(),
+    timerMap = new Map()
+
+function buildFuncMap() {
     for (let timePoint in records) {
-        if ((timePoint - 0) <= startPoint) {
-            replayers.forEach(func => {
-                func(data.records[timePoint]);
-            });
-            continue;
-        }
         funcMap.set(timePoint - 0, () => {
             replayers.forEach(func => {
-                func(data.records[timePoint]);
-            });
-        });
+                func(records[timePoint], self)
+            })
+        })
     }
-    play()
-};
+}
 
-let play = (currPoint = startPoint) => {
+function play(startPoint = 0, fresh) {
+    fresh && pageRender(domObj, self)
     for (let [timePoint, timeFunc] of funcMap) {
-        if (timePoint >= currPoint) {
-            timerMap.set(
-                timePoint - 0,
-                setTimeout(() => {
-                    timeFunc.call(null);
-                    timerMap.delete(timePoint);
-                }, (timePoint - currPoint) * interval));
+        if (timePoint >= startPoint) {
+            timerMap.set(timePoint - 0, self.setTimeout(() => {
+                timeFunc()
+                timerMap.delete(timePoint)
+            }, (timePoint - startPoint) * interval))
+        } else {
+            fresh && timeFunc()
+            fresh && timerMap.delete(timePoint)
         }
-
     }
-};
+}
 
-let stop = currPoint => {
-    for (let timeFunc of timerMap.values()) {
-        clearInterval(timeFunc);
+function stop() {
+    for (let [key, timer] of timerMap) {
+        self.clearInterval(timer)
+        timerMap.delete(key)
     }
-};
+
+}
 
 export default {
     init,
     play,
     stop
-};
+}

@@ -171,14 +171,18 @@ function domToPlainObject(node, format = () => {}) {
   return plainObject
 }
 
-function plainObjectToDom(obj, callback = () => {}) {
+function plainObjectToDom(obj, self = window, callback = () => {}) {
   if (!isPlainObject(obj)) return
   let _node
   try {
     switch (obj.nodeType) {
       case 1:
       case 9:
-        _node = document.createElement(obj.tagName)
+        if (obj.tagName.toUpperCase() === "SCRIPT") {
+          _node = self.document.createElement("NO-SCRIPT");
+        } else {
+          _node = self.document.createElement(obj.tagName);
+        }
         if (!_node) return;
         if (obj.attributes) {
           for (let pro in obj.attributes) {
@@ -186,7 +190,7 @@ function plainObjectToDom(obj, callback = () => {}) {
           }
         }
         obj.childNodes && obj.childNodes.forEach(val => {
-          let _dom = plainObjectToDom(val, callback)
+          let _dom = plainObjectToDom(val, self, callback)
           _dom && _node.appendChild(_dom)
         })
         break;
@@ -238,6 +242,113 @@ function watchInputNode(callback) {
 
 function urlIsAbsolute(url) {
   return /^(?:[a-z]+:)?\/\//i.test(url)
+}
+
+/**
+ * code from 'https://github.com/niksy/throttle-debounce/blob/master/throttle.js'
+ */
+function throttle(delay, noTrailing, callback, debounceMode) {
+
+  /*
+   * After wrapper has stopped being called, this timeout ensures that
+   * `callback` is executed at the proper times in `throttle` and `end`
+   * debounce modes.
+   */
+  var timeoutID;
+  var cancelled = false;
+
+  // Keep track of the last time `callback` was executed.
+  var lastExec = 0;
+
+  // Function to clear existing timeout
+  function clearExistingTimeout() {
+    if (timeoutID) {
+      clearTimeout(timeoutID);
+    }
+  }
+
+  // Function to cancel next exec
+  function cancel() {
+    clearExistingTimeout();
+    cancelled = true;
+  }
+
+
+  // `noTrailing` defaults to falsy.
+  if (typeof noTrailing !== 'boolean') {
+    debounceMode = callback;
+    callback = noTrailing;
+    noTrailing = undefined;
+  }
+
+  /*
+   * The `wrapper` function encapsulates all of the throttling / debouncing
+   * functionality and when executed will limit the rate at which `callback`
+   * is executed.
+   */
+  function wrapper() {
+
+    var self = this;
+    var elapsed = Date.now() - lastExec;
+    var args = arguments;
+
+    if (cancelled) {
+      return;
+    }
+
+    // Execute `callback` and update the `lastExec` timestamp.
+    function exec() {
+      lastExec = Date.now();
+      callback.apply(self, args);
+    }
+
+    /*
+     * If `debounceMode` is true (at begin) this is used to clear the flag
+     * to allow future `callback` executions.
+     */
+    function clear() {
+      timeoutID = undefined;
+    }
+
+    if (debounceMode && !timeoutID) {
+      /*
+       * Since `wrapper` is being called for the first time and
+       * `debounceMode` is true (at begin), execute `callback`.
+       */
+      exec();
+    }
+
+    clearExistingTimeout();
+
+    if (debounceMode === undefined && elapsed > delay) {
+      /*
+       * In throttle mode, if `delay` time has been exceeded, execute
+       * `callback`.
+       */
+      exec();
+
+    } else if (noTrailing !== true) {
+      /*
+       * In trailing throttle mode, since `delay` time has not been
+       * exceeded, schedule `callback` to execute `delay` ms after most
+       * recent execution.
+       *
+       * If `debounceMode` is true (at begin), schedule `clear` to execute
+       * after `delay` ms.
+       *
+       * If `debounceMode` is false (at end), schedule `callback` to
+       * execute after `delay` ms.
+       */
+      timeoutID = setTimeout(debounceMode ? clear : exec, debounceMode === undefined ? delay - elapsed : delay);
+    }
+
+  }
+
+  wrapper.cancel = cancel;
+
+  // Return the wrapper function.
+  return wrapper;
+
 }
 
 /** memorySizeOf*/
@@ -337,6 +448,16 @@ function isFunction(v) {
   return typeof v === 'function' || false;
 };
 
+function isEmpty(obj) {
+  if (obj == null) return true;
+  if (obj.length > 0) return false;
+  if (obj.length === 0) return true;
+  for (var key in obj) {
+    if (hasOwnProperty.call(obj, key)) return false;
+  }
+  return true;
+}
+
 function nodeRemove(node) {
   if (!node || !node.nodeType) return
   if (Element.prototype.remove)
@@ -375,10 +496,12 @@ export {
   isPlainObject,
   isRegExp,
   isFunction,
+  isEmpty,
   domToPlainObject,
   plainObjectToDom,
   watchInputNode,
   urlIsAbsolute,
+  throttle,
   memorySizeOf,
   nodeRemove,
   formatUrlAttributes

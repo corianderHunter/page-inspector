@@ -2,6 +2,12 @@ import {
   pageCollector
 } from './page'
 
+import node from './units/node'
+import mouse from './units/mouse'
+import browserWindow from './units/browserWindow'
+
+let producers = [node, mouse, browserWindow]
+
 let records = {},
   recordStart,
   interval,
@@ -23,7 +29,8 @@ function takeRecord(data, prop) {
 }
 
 
-export function init(producers, _interval = 50) {
+
+export function init(_interval = 50) {
   status = true;
   interval = _interval
   recordStart = Date.now();
@@ -31,7 +38,7 @@ export function init(producers, _interval = 50) {
   producers.forEach(val => val.record.init(takeRecord, interval))
 }
 
-export function destroy(producers) {
+export function destroy() {
   producers.forEach(val => val.record.destroy(interval))
   status = false
 }
