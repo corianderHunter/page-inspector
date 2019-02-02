@@ -1,1 +1,1 @@
-cd /server && npm install && pm2-runtime start ./src/server.js
+cd /server && npm install && pm2-runtime start ../pm2.json

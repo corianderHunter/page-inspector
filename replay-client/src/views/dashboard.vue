@@ -20,10 +20,8 @@
 <script>
 import playTools from "./playTools";
 import fetch from "@utils/fetch";
-// import replay from "@/../../src/replay";
-import replay from "@/../../dist/page-replay";
-
-console.log(replay);
+import replay from "@/../../src/replay";
+// import replay from "@/../../dist/page-replay";
 
 let url = new URL("http://localhost:8080/#/");
 

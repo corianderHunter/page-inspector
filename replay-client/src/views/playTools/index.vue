@@ -130,7 +130,8 @@ export default {
             this.setTimer();
             this.playStatus = true;
             this.time.value = e.target.value - 0;
-            this.$emit("timeChange", this.time.value - 0);
+            console.log(this.time.value);
+            this.$emit("timeChange", this.time.value);
         }
     }
 };

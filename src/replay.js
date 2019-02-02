@@ -8,7 +8,7 @@ import node from './units/node'
 import mouse from './units/mouse'
 import browserWindow from './units/browserWindow'
 
-let self, records, domObj, interval, replayers;
+let ws, self, records, domObj, interval, replayers;
 
 let consumers = [node, mouse, browserWindow]
 
@@ -18,6 +18,7 @@ function getReplayers() {
 
 
 function init(_self, _dom, data) {
+
     self = _self
     domObj = _dom
     records = data.records
@@ -42,6 +43,7 @@ function buildFuncMap() {
 }
 
 function play(startPoint = 0, fresh) {
+    stop();
     fresh && pageRender(domObj, self)
     for (let [timePoint, timeFunc] of funcMap) {
         if (timePoint >= startPoint) {

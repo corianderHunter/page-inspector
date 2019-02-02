@@ -4,7 +4,7 @@ services:
     mongo:
         image: mongo
         restart: always
-        volumns:
+        volumes:
             - ./db/mongo:/data/db
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
@@ -25,7 +25,8 @@ services:
         volumes:
             - ../server:/server
         ports:
-            - 8000:8000
+            - ${PORT}:${PORT}
+            - ${WSS_PORT}:${WSS_PORT}
         depends_on:
             - mongo
         command: sh /server/docker-server-start.sh

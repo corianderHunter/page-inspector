@@ -1,3 +1,4 @@
+import initWs from './ws'
 import {
   pageCollector
 } from './page'
@@ -5,6 +6,8 @@ import {
 import node from './units/node'
 import mouse from './units/mouse'
 import browserWindow from './units/browserWindow'
+
+let ws
 
 let producers = [node, mouse, browserWindow]
 
@@ -28,9 +31,10 @@ function takeRecord(data, prop) {
   }
 }
 
-
-
 export function init(_interval = 50) {
+  let ws = initWs()
+  if (!ws)
+    return console.error('websocket init failed!')
   status = true;
   interval = _interval
   recordStart = Date.now();

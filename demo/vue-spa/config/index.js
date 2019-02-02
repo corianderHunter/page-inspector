@@ -5,12 +5,6 @@
 const path = require('path')
 const devEnv = require('./dev.env')
 
-const {
-  proxyPort
-} = require('../../server/const')
-
-const proxyServer = 'http://' + 'localhost:' + proxyPort
-
 module.exports = {
   dev: {
 

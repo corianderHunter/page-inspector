@@ -35,7 +35,6 @@ export default {
     },
     computed: {
         scale() {
-            console.log(this.width / (this.timeMax - this.timeMin));
             return this.width / (this.timeMax - this.timeMin);
         },
         pixelWidth() {

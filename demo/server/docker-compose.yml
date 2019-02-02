@@ -1,0 +1,11 @@
+version: '3.1'
+
+services:
+    mongo:
+        image: node-pm2
+        restart: always
+        volumes:
+            - ../server:/server
+        ports:
+            - 8000:8000
+        command: sh /server/docker-server-start.sh
