@@ -1,0 +1,4 @@
+let recordSchema = {
+    path: String,
+
+}
