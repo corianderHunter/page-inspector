@@ -1,9 +1,12 @@
 const WebSocket = require('ws')
 const mongoose = require('mongoose');
+const {
+    pick
+} = require('underscore')
 
 const Website = mongoose.model('Website')
 const Session = mongoose.model('Session')
-const Record = mongoose.model('Record')
+const getRecordModel = require('./models/record')
 
 const messageConfig = {
     init: 1,
@@ -44,6 +47,7 @@ let messageHandler = {
             page,
             path,
             interval,
+            ip,
             userSession = ''
         } = value
         let website = await Website.findOneAndUpdate({
@@ -66,10 +70,11 @@ let messageHandler = {
                 }
                 return data
             })
-        await (new Session({
+        return await (new Session({
             websiteId: website._id || '',
             userAgent,
             page,
+            ip,
             path,
             interval,
             version,
@@ -77,26 +82,37 @@ let messageHandler = {
             userSession
         })).save()
     },
-    close(value) {
-
+    async record(data, session, Record) {
+        let maxTime = data['timeKey'] - 0,
+            sessionId = session['_id'],
+            path = session['path'];
+        console.log('=======', sessionId, maxTime)
+        Website.findByIdAndUpdate(sessionId, {
+            $set: {
+                max: maxTime
+            }
+        }).exec();
+        (new Record({
+            sessionId,
+            path,
+            data: data['records'],
+            createdAt: Date.now()
+        })).save()
     },
-    async record(value) {
-
-    },
-    freeze() {}
 }
-
-function statusFunc(message) {}
 
 function heartbeat() {
     this.isAlive = true;
 }
 
-wss.on('connection', function connection(ws) {
-    let isInit = false;
+wss.on('connection', function connection(ws, req) {
+    let ip = req.connection.remoteAddress
+    let isInit = false,
+        currentSession,
+        Record;
     ws.isAlive = true;
     ws.on('pong', heartbeat);
-    ws.on('message', function incoming(message) {
+    ws.on('message', async function incoming(message) {
         let type,
             value
         try {
@@ -104,16 +120,20 @@ wss.on('connection', function connection(ws) {
             type = _mess.type || 'record'
             value = _mess.value || {}
         } catch (e) {
-            console.error(e)
+            console.error('wss message JSON.parse error:' + e)
         }
         if (type === 'init') {
             isInit = true
-            messageHandler['init'](value)
+            currentSession = pick(await messageHandler['init']({
+                ...value,
+                ip
+            }), ['_id', 'websiteId', 'path'])
+            Record = getRecordModel(currentSession.websiteId)
             return
         }
         if (!isInit) return console.info('wss receive meassge from client,waiting "init" message');
         try {
-            messageHandler[type] && messageHandler[type](value)
+            messageHandler[type] && messageHandler[type](value, currentSession, Record)
         } catch (e) {
             console.error('wss handle message error:' + e)
         }

@@ -16,7 +16,9 @@ let connect = () => {
 };
 
 let initServer = () => {
-    require('require-all')(__dirname + '/models');
+    const recordModel = require('./models/record')
+    require('./models/session')
+    require('./models/website')
     require('./wss');
 
     console.log('websocket server listening at port:%s', process.env.WSS_PORT);

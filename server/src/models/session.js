@@ -12,6 +12,11 @@ let sessionSchema = new Schema({
     page: Object,
     path: String,
     interval: Number,
+    ip: String,
+    max: {
+        type: Number,
+        default: 0
+    },
     version: String,
     userSession: String
 })

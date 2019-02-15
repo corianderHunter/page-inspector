@@ -21,6 +21,5 @@ websiteSchema.methods = {
 websiteSchema.statics = {
 
 }
-module.exports = function () {
-    return;
-}
+
+mongoose.model('Website', websiteSchema)

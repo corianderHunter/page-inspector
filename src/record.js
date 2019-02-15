@@ -3,7 +3,8 @@ import {
   pageCollector
 } from './page'
 import {
-  memorySizeOf
+  memorySizeOf,
+  isEmpty
 } from './utils'
 import node from './units/node'
 import mouse from './units/mouse'
@@ -40,9 +41,10 @@ function takeRecord(data, prop) {
 }
 
 export async function init(_interval = 50) {
-  let ws = await initWs()
+  ws = await initWs()
   if (!ws)
     return console.error('websocket init failed!')
+  globalWsFunc();
   status = true;
   interval = _interval
   recordStart = Date.now();
@@ -86,30 +88,34 @@ export function getRecords() {
   }
 }
 
-
 window.setTimeout(init, 300)
 
-window.setInterval(() => {
-  if (memorySizeOf(records) > 1024 * 2) {
-    try {
-      ws.send(JSON.stringify({
-        value: records
-      }));
-    } catch (e) {
-      console.error(e)
+function globalWsFunc() {
+  window.setInterval(() => {
+    if (memorySizeOf(records) > 1024) {
+      wsRecordsSend()
     }
-    records = {}
-  }
-}, 5000)
+  }, 5000)
 
-window.onbeforeunload = function () {
+  window.onunload = wsRecordsSend
+
+  window.onbeforeunload = wsRecordsSend
+}
+
+function wsRecordsSend() {
+  if (isEmpty(records)) return;
   try {
+    let timeKey = Math.floor((Date.now() - recordStart) / interval)
     ws.send(JSON.stringify({
-      value: records
+      value: {
+        records,
+        timeKey
+      },
     }));
   } catch (e) {
     console.error(e)
   }
+  records = {}
 }
 
 export default {
