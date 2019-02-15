@@ -355,7 +355,7 @@ function throttle(delay, noTrailing, callback, debounceMode) {
 /**
  * code from 'https://gist.github.com/zensh/4975495'
  */
-function memorySizeOf(obj, format) {
+function memorySizeOf(obj, format = 'KB') {
   let bytes = 0;
 
   function sizeOf(obj) {

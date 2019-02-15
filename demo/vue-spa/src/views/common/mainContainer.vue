@@ -463,20 +463,6 @@ import fetch from "@utils/fetch";
 // import record from "@/../../../src/record";
 import record from "@/../../../dist/page-record";
 import { domToPlainObject } from "@/../../../src/utils";
-
-let ws;
-window._ws = ws = new WebSocket("ws://localhost:9002");
-
-const showMessage = message => {
-    console.log(message);
-};
-
-ws.onerror = () => showMessage("WebSocket error");
-ws.onopen = () => showMessage("WebSocket connection established");
-ws.onclose = () => showMessage("WebSocket connection closed");
-ws.onmessage = data => {
-    console.log(data);
-};
 export default {
     data() {
         return {

@@ -1,26 +1,31 @@
+import {
+    resolve
+} from "url";
+
 export default function (url) {
     let wssUrl = url || process.env.WSS_URL
-    if (wssUrl) {
+    if (!wssUrl) {
         console.error('missing websocket server address!')
         return false
     }
     let ws = new WebSocket(wssUrl);
-
-    ws.onerror = () => {
-        console.info('ws error')
-    }
-
-    ws.onopen = () => {
-        console.info('ws open')
-    }
-
     ws.onclose = () => {
         console.info('ws close')
     }
 
     ws.onmessage = (data) => {
-        console.log(data);
+        console.info('ws client receive message:' + data);
     }
+    return new Promise((resolve, reject) => {
+        ws.onerror = () => {
+            console.info('ws error')
+            reject()
+        }
 
-    return ws
+        ws.onopen = () => {
+            console.info('ws open')
+            resolve(ws)
+        }
+
+    })
 }

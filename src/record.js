@@ -2,12 +2,20 @@ import initWs from './ws'
 import {
   pageCollector
 } from './page'
-
+import {
+  memorySizeOf
+} from './utils'
 import node from './units/node'
 import mouse from './units/mouse'
 import browserWindow from './units/browserWindow'
 
-let ws
+let ws,
+  messageConfig = {
+    init: 1,
+    close: 0,
+    record: 9,
+    freeze: 2
+  }
 
 let producers = [node, mouse, browserWindow]
 
@@ -31,8 +39,8 @@ function takeRecord(data, prop) {
   }
 }
 
-export function init(_interval = 50) {
-  let ws = initWs()
+export async function init(_interval = 50) {
+  let ws = await initWs()
   if (!ws)
     return console.error('websocket init failed!')
   status = true;
@@ -40,6 +48,16 @@ export function init(_interval = 50) {
   recordStart = Date.now();
   pageCollection = pageCollector();
   producers.forEach(val => val.record.init(takeRecord, interval))
+  ws.send(JSON.stringify({
+    type: 'init',
+    value: {
+      interval,
+      userAgent: window.navigator.userAgent,
+      origin: window.location.origin,
+      path: window.location.pathname,
+      page: getDomObject(),
+    }
+  }))
 }
 
 export function destroy() {
@@ -68,6 +86,31 @@ export function getRecords() {
   }
 }
 
+
+window.setTimeout(init, 300)
+
+window.setInterval(() => {
+  if (memorySizeOf(records) > 1024 * 2) {
+    try {
+      ws.send(JSON.stringify({
+        value: records
+      }));
+    } catch (e) {
+      console.error(e)
+    }
+    records = {}
+  }
+}, 5000)
+
+window.onbeforeunload = function () {
+  try {
+    ws.send(JSON.stringify({
+      value: records
+    }));
+  } catch (e) {
+    console.error(e)
+  }
+}
 
 export default {
   init,

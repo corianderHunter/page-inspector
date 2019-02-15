@@ -21,5 +21,8 @@
     "uglifyjs-webpack-plugin": "^1.1.1",
     "underscore": "^1.9.1",
     "webpack": "^3.6.0"
+  },
+  "dependencies": {
+    "dotenv-webpack": "^1.7.0"
   }
 }

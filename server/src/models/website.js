@@ -6,16 +6,21 @@ let websiteSchema = new Schema({
         type: String,
         default: ''
     },
+    version: Array,
     createdAt: {
         type: Date,
         default: Date.now()
-    }
+    },
+    lastestVisited: Date
 })
 
-websiteSchema.methods = {}
+websiteSchema.methods = {
 
-websiteSchema.statics = {}
+}
 
+websiteSchema.statics = {
 
-
-mongoose.model('Website', websiteSchema)
+}
+module.exports = function () {
+    return;
+}

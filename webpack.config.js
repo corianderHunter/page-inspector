@@ -3,6 +3,7 @@ const ora = require('ora')
 const chalk = require('chalk')
 const webpack = require('webpack');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 const spinner = ora('building for production...')
 spinner.start()
@@ -28,7 +29,9 @@ function generateConfig(source, outputName) {
       }]
     },
     devtool: 'source-map',
-    plugins: []
+    plugins: [
+      new Dotenv()
+    ]
   };
 
   if (uglify) {
