@@ -4,12 +4,14 @@
         <iframe ref="replayIframe" scrolling="no"></iframe>
         <div class="page-source">
             From：
-            <a :href="url">{{url}}</a>
+            <a :href="url">{{url||'---'}}</a>
         </div>
         <div class="play-tools-div">
             <play-tools
-                v-if="recordData"
-                :recordData="recordData"
+                v-if="max&&$options.recordData"
+                :max="max"
+                :interval="$options.interval"
+                :records="$options.recordData"
                 @timeChange="timeChange"
                 @play="play"
             ></play-tools>
@@ -21,37 +23,77 @@
 import playTools from "./playTools";
 import fetch from "@utils/fetch";
 import replay from "@/../../src/replay";
-// import replay from "@/../../dist/page-replay";
-
-let url = new URL("http://localhost:8080/#/");
 
 export default {
     replayIframe: null,
     dom: null,
+    recordData: null,
+    interval: null,
     data() {
         return {
-            recordData: null,
-            url
+            max: 0
         };
+    },
+    computed: {
+        websiteId() {
+            return this.$route.params.websiteId;
+        },
+        sessionId() {
+            return this.$route.params.sessionId;
+        },
+        id() {
+            return this.$route.params.id;
+        }
     },
     components: {
         playTools
     },
     mounted() {
         this.$options.replayIframe = this.$refs.replayIframe.contentWindow;
-        fetch
-            .get("/record", {
-                params: {
-                    url: url.href
-                }
-            })
-            .then(res => {
-                this.recordData = res.data.records;
-                this.$options.dom = res.data.dom;
-                this.initReplayer();
+        Promise.all([this.getSession(), this.getRecords()]).then(args => {
+            let [session, recordIds] = args;
+            console.log(session);
+            this.$options.dom = session.page;
+            this.$options.interval = session.interval;
+            this.max = session.max;
+            this.max = this.getAllRecords(recordIds).then(records => {
+                this.$options.recordData = records.reduce((result, val) => {
+                    return { ...result.data, ...val.data };
+                });
             });
+            this.initReplayer();
+        });
     },
     methods: {
+        getSession() {
+            return this.$service.getSession({
+                urlParams: {
+                    id: this.sessionId
+                }
+            });
+        },
+        getRecords() {
+            return this.$service.getRecords({
+                urlParams: {
+                    websiteId: this.websiteId,
+                    sessionId: this.sessionId
+                }
+            });
+        },
+        getAllRecords(ids) {
+            return Promise.all(
+                ids.map(async id => {
+                    return await this.$service
+                        .getRecord({
+                            urlParams: {
+                                websiteId: this.websiteId,
+                                id
+                            }
+                        })
+                        .then(data => data.data || {});
+                })
+            );
+        },
         timeChange(time) {
             replay.play(time, true);
         },
@@ -62,7 +104,8 @@ export default {
             replay.init(
                 this.$options.replayIframe,
                 this.$options.dom,
-                this.recordData
+                this.$options.recordData,
+                this.$options.interval
             );
         }
     }

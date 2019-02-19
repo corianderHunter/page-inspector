@@ -1,5 +1,5 @@
 <template>
-    <div class="play-tools">
+    <div class="play-tools" v-if="max">
         <i
             class="play-btn iconfont"
             :class="{'icon-pause':playStatus,'icon-play':!playStatus,'cna':isEnd}"
@@ -10,9 +10,9 @@
             <input
                 type="range"
                 class="time-range"
-                :max="time.max"
-                :min="time.min"
-                :value="time.value"
+                :max="max"
+                :min="min"
+                :value="time"
                 @change="timeChange"
                 :step="step"
             >
@@ -49,16 +49,15 @@ export default {
             width: 800,
             playStatus: false,
             step: 1,
-            time: {
-                value: 0,
-                min: 0,
-                max: 0
-            },
+            time: 0,
+            min: 0,
             speed: 1
         };
     },
     props: {
-        recordData: Object
+        max: Number,
+        interval: Number,
+        records: Object
     },
     components: { heatBar },
     watch: {
@@ -75,44 +74,30 @@ export default {
                 this.clearTimer();
             }
         },
-        recordData() {
-            this.setData();
+        max(val) {
+            console.log("max", val);
+            val && (this.playStatus = true);
         }
     },
     computed: {
-        records() {
-            return this.recordData.records;
-        },
-        interval() {
-            return this.recordData.interval;
-        },
         isEnd() {
-            return this.time.value >= this.time.max;
+            return this.time >= this.max;
         },
         timeStart() {
-            return getTimeStr((this.time.value * this.interval) / 1000);
+            return getTimeStr((this.time * this.interval) / 1000);
         },
         timeEnd() {
-            return getTimeStr((this.time.max * this.interval) / 1000);
+            return getTimeStr((this.max * this.interval) / 1000);
         }
     },
     destroyed() {
         this.setTimer();
     },
-    mounted() {
-        this.setData();
-    },
     methods: {
-        setData() {
-            let keys = Object.keys(this.records).map(val => val - 0);
-            this.time.max = keys[keys.length - 1];
-            this.time.value = this.time.min;
-            this.playStatus = true;
-        },
         clickPlay() {
             if (this.isEnd) return;
             this.playStatus = !this.playStatus;
-            this.$emit("play", this.time.value - 0, this.playStatus);
+            this.$emit("play", this.time - 0, this.playStatus);
         },
         setTimer() {
             clearInterval(this.$options.timer);
@@ -123,15 +108,13 @@ export default {
             this.$options.timer = null;
         },
         play() {
-            !this.isEnd &&
-                (this.time.value = this.time.value + 1000 / this.interval);
+            !this.isEnd && (this.time = this.time + 1000 / this.interval);
         },
         timeChange(e) {
             this.setTimer();
             this.playStatus = true;
-            this.time.value = e.target.value - 0;
-            console.log(this.time.value);
-            this.$emit("timeChange", this.time.value);
+            this.time = e.target.value - 0;
+            this.$emit("timeChange", this.time);
         }
     }
 };

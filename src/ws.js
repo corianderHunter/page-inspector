@@ -1,7 +1,3 @@
-import {
-    resolve
-} from "url";
-
 export default function (url) {
     let wssUrl = url || process.env.WSS_URL
     if (!wssUrl) {

@@ -1,5 +1,3 @@
-const express = require('express');
-const routers = require('./routes');
 const mongoose = require('mongoose');
 const {
     debounce
@@ -9,23 +7,30 @@ let connect = () => {
     let uri = `mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_URI}`;
     let options = {
         dbName: process.env.MONGO_DATABASE
-
     };
     mongoose.connect(uri, options);
     return mongoose.connection;
 };
 
 let initServer = () => {
-    const recordModel = require('./models/record')
     require('./models/session')
     require('./models/website')
-    require('./wss');
+    const express = require('express');
+    const routers = require('./routes');
+    const bodyParser = require('body-parser')
+    const compression = require('compression')
 
+    require('./wss');
     console.log('websocket server listening at port:%s', process.env.WSS_PORT);
 
     const port = process.env.PORT;
-
     let app = express();
+    app.use(bodyParser.json());
+    app.use(compression());
+    app.use(bodyParser.urlencoded({
+        extended: true
+    }));
+
     app.use(routers);
     let server = app.listen(port, function () {
         var host = server.address().address;

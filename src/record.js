@@ -82,10 +82,7 @@ export function getDomMap() {
 export function getRecords() {
   if (!status)
     return console.warn('recorder is not inited')
-  return {
-    interval,
-    records
-  }
+  return records
 }
 
 window.setTimeout(init, 300)

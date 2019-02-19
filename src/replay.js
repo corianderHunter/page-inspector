@@ -17,12 +17,12 @@ function getReplayers() {
 }
 
 
-function init(_self, _dom, data) {
+function init(_self, _dom, _records, _interval) {
 
     self = _self
     domObj = _dom
-    records = data.records
-    interval = data.interval
+    records = _records
+    interval = _interval
     if (!records || isEmpty(records)) return
     replayers = getReplayers()
     buildFuncMap()

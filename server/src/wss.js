@@ -1,19 +1,20 @@
-const WebSocket = require('ws')
+const WebSocket = require('ws');
 const mongoose = require('mongoose');
+let moment = require('moment');
 const {
     pick
-} = require('underscore')
+} = require('underscore');
 
-const Website = mongoose.model('Website')
-const Session = mongoose.model('Session')
-const getRecordModel = require('./models/record')
+const Website = mongoose.model('Website');
+const Session = mongoose.model('Session');
+const getRecordModel = require('./models/record');
 
 const messageConfig = {
     init: 1,
     close: 0,
     record: 9,
-    freeze: 2,
-}
+    freeze: 2
+};
 
 const wss = new WebSocket.Server({
     port: process.env.WSS_PORT,
@@ -49,28 +50,28 @@ let messageHandler = {
             interval,
             ip,
             userSession = ''
-        } = value
+        } = value;
         let website = await Website.findOneAndUpdate({
                 origin,
                 version
             }, {
                 $set: {
-                    lastestVisited: Date.now()
+                    lastestVisited: moment().format('YYYY-MM-DD HH:mm:ss')
                 }
             })
             .exec()
-            .then((data) => {
+            .then(data => {
                 if (!data) {
-                    return (new Website({
+                    return new Website({
                         origin,
                         version,
-                        createdAt: Date.now(),
-                        lastestVisited: Date.now()
-                    })).save()
+                        createdAt: moment().format('YYYY-MM-DD HH:mm:ss'),
+                        lastestVisited: moment().format('YYYY-MM-DD HH:mm:ss')
+                    }).save();
                 }
-                return data
-            })
-        return await (new Session({
+                return data;
+            });
+        return await new Session({
             websiteId: website._id || '',
             userAgent,
             page,
@@ -78,64 +79,68 @@ let messageHandler = {
             path,
             interval,
             version,
-            createdAt: Date.now(),
+            createdAt: moment().format('YYYY-MM-DD HH:mm:ss'),
             userSession
-        })).save()
+        }).save();
     },
     async record(data, session, Record) {
         let maxTime = data['timeKey'] - 0,
             sessionId = session['_id'],
             path = session['path'];
-        console.log('=======', sessionId, maxTime)
-        Website.findByIdAndUpdate(sessionId, {
+        Session.findByIdAndUpdate(sessionId, {
             $set: {
                 max: maxTime
             }
         }).exec();
-        (new Record({
+        new Record({
             sessionId,
-            path,
             data: data['records'],
-            createdAt: Date.now()
-        })).save()
-    },
-}
+            createdAt: moment().format('YYYY-MM-DD HH:mm:ss')
+        }).save();
+    }
+};
 
 function heartbeat() {
     this.isAlive = true;
 }
 
 wss.on('connection', function connection(ws, req) {
-    let ip = req.connection.remoteAddress
+    let ip = req.connection.remoteAddress;
     let isInit = false,
         currentSession,
         Record;
     ws.isAlive = true;
     ws.on('pong', heartbeat);
     ws.on('message', async function incoming(message) {
-        let type,
-            value
+        let type, value;
         try {
-            let _mess = JSON.parse(message)
-            type = _mess.type || 'record'
-            value = _mess.value || {}
+            let _mess = JSON.parse(message);
+            type = _mess.type || 'record';
+            value = _mess.value || {};
         } catch (e) {
-            console.error('wss message JSON.parse error:' + e)
+            console.error('wss message JSON.parse error:' + e);
         }
         if (type === 'init') {
-            isInit = true
-            currentSession = pick(await messageHandler['init']({
-                ...value,
-                ip
-            }), ['_id', 'websiteId', 'path'])
-            Record = getRecordModel(currentSession.websiteId)
-            return
+            isInit = true;
+            currentSession = pick(
+                await messageHandler['init']({
+                    ...value,
+                    ip
+                }),
+                ['_id', 'websiteId', 'path']
+            );
+            Record = getRecordModel(currentSession.websiteId);
+            return;
         }
-        if (!isInit) return console.info('wss receive meassge from client,waiting "init" message');
+        if (!isInit)
+            return console.info(
+                'wss receive meassge from client,waiting "init" message'
+            );
         try {
-            messageHandler[type] && messageHandler[type](value, currentSession, Record)
+            messageHandler[type] &&
+                messageHandler[type](value, currentSession, Record);
         } catch (e) {
-            console.error('wss handle message error:' + e)
+            console.error('wss handle message error:' + e);
         }
     });
 });
@@ -149,4 +154,4 @@ const interval = setInterval(function ping() {
     });
 }, 30000);
 
-module.exports = wss
+module.exports = wss;

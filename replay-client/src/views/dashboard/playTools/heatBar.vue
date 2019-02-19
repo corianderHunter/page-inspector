@@ -142,7 +142,7 @@ export default {
                 10
             );
         },
-        drawBar(data) {
+        drawBar() {
             this.initCanvas(document.getElementById("playTools"));
             this.$options.wad.width = this.scale < 1 ? 1 : this.scale;
             this.renderPoints.forEach(val =>

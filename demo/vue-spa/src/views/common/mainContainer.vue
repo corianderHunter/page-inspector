@@ -500,23 +500,10 @@ export default {
     },
     mounted() {
         // this.record()
-        return;
-        setTimeout(() => {
-            // // noScript();
-            this.record();
-            return;
-            fetch
-                .get("/record", {
-                    params: {
-                        url: window.location.href
-                    }
-                })
-                .then(res => {
-                    // console.log(sizeof(res.data));
-                    // console.log(memorySizeOf(res.data));
-                    replay.play(res.data, 400);
-                });
-        }, 1000);
+        if (window.Worker) {
+            // console.info("register worker!");
+            // new Worker("/static/worker.js");
+        }
     },
     methods: {
         initRecorder() {},

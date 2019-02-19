@@ -48,14 +48,14 @@ class Service {
               title: `${self.defaults.description}成功`
             })
           }
-          return res
+          return res.data.data
         }).catch(err => {
           if (!customMessage) {
             Notification.error({
               duration: 3000,
               title: `${self.defaults.
                 description}失败`,
-              message: '服务器响应：' + err.message
+              message: '服务器响应：' + err.data || error.message || 'unkown'
             })
           }
           return Promise.reject(err)
