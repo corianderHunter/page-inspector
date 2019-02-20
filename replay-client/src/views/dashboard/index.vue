@@ -4,14 +4,14 @@
         <iframe ref="replayIframe" scrolling="no"></iframe>
         <div class="page-source">
             From：
-            <a :href="url">{{url||'---'}}</a>
+            <a :href="url" target="_blank">{{url||'---'}}</a>
         </div>
         <div class="play-tools-div">
             <play-tools
-                v-if="max&&$options.recordData"
+                v-if="max&&recordData"
                 :max="max"
-                :interval="$options.interval"
-                :records="$options.recordData"
+                :interval="interval"
+                :records="recordData"
                 @timeChange="timeChange"
                 @play="play"
             ></play-tools>
@@ -22,16 +22,18 @@
 <script>
 import playTools from "./playTools";
 import fetch from "@utils/fetch";
-import replay from "@/../../src/replay";
+import replay from "@/../../dist/page-replay";
 
 export default {
     replayIframe: null,
     dom: null,
-    recordData: null,
-    interval: null,
+
     data() {
         return {
-            max: 0
+            max: 0,
+            url: "",
+            recordData: null,
+            interval: null
         };
     },
     computed: {
@@ -50,21 +52,32 @@ export default {
     },
     mounted() {
         this.$options.replayIframe = this.$refs.replayIframe.contentWindow;
-        Promise.all([this.getSession(), this.getRecords()]).then(args => {
-            let [session, recordIds] = args;
-            console.log(session);
+        Promise.all([
+            this.getWebsite(),
+            this.getSession(),
+            this.getRecords()
+        ]).then(args => {
+            let [website, session, recordIds] = args;
+            this.url = website.origin + session.path;
             this.$options.dom = session.page;
-            this.$options.interval = session.interval;
+            this.interval = session.interval;
             this.max = session.max;
-            this.max = this.getAllRecords(recordIds).then(records => {
-                this.$options.recordData = records.reduce((result, val) => {
-                    return { ...result.data, ...val.data };
+            this.getAllRecords(recordIds).then(records => {
+                this.recordData = records.reduce((result, val) => {
+                    return { ...result, ...val };
                 });
+                this.initReplayer();
             });
-            this.initReplayer();
         });
     },
     methods: {
+        getWebsite() {
+            return this.$service.getWebsite({
+                urlParams: {
+                    id: this.websiteId
+                }
+            });
+        },
         getSession() {
             return this.$service.getSession({
                 urlParams: {
@@ -104,8 +117,8 @@ export default {
             replay.init(
                 this.$options.replayIframe,
                 this.$options.dom,
-                this.$options.recordData,
-                this.$options.interval
+                this.recordData,
+                this.interval
             );
         }
     }

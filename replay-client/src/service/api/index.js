@@ -17,6 +17,13 @@ export default [{
   data: {},
   description: '获取站点列表'
 }, {
+  name: 'getWebsite',
+  method: 'get',
+  url: '/website/:id',
+  params: {},
+  data: {},
+  description: '获取站点信息'
+}, {
   name: 'getSessionsByWebsite',
   method: 'get',
   url: '/sessions',

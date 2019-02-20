@@ -29,6 +29,17 @@ router.route('/website/:id')
     .all((req, res, next) => {
         next()
     })
+    .get((req, res) => {
+        mongooseAction(async () => {
+            let {
+                id
+            } = req.params
+            let website = await Website.get({
+                _id: id
+            })
+            json(res, website)
+        }, res)
+    })
     .delete((req, res) => {
         mongooseAction(async () => {
             let {
@@ -62,7 +73,7 @@ router.route('/sessions')
                 return await Session.delete(_id)
             }))
             json(res, '删除成功！')
-        })
+        }, res)
     })
 
 router.route('/session/:id')
@@ -74,10 +85,6 @@ router.route('/session/:id')
             let {
                 id
             } = req.params
-            if (!id)
-                return json(res, '缺少必须的查询参数！', {
-                    status: 400
-                })
             let session = await Session.get({
                 _id: id
             })

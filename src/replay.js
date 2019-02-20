@@ -4,16 +4,16 @@ import {
 import {
     pageRender
 } from './page'
-import node from './units/node'
-import mouse from './units/mouse'
-import browserWindow from './units/browserWindow'
+import node from './units/node.replay'
+import mouse from './units/mouse.replay'
+import browserWindow from './units/browserWindow.replay'
 
-let ws, self, records, domObj, interval, replayers;
+let self, records, domObj, interval, replayers;
 
 let consumers = [node, mouse, browserWindow]
 
 function getReplayers() {
-    return consumers.map(val => val.replay) || []
+    return consumers.map(val => val) || []
 }
 
 

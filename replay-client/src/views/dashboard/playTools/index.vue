@@ -73,11 +73,10 @@ export default {
             } else {
                 this.clearTimer();
             }
-        },
-        max(val) {
-            console.log("max", val);
-            val && (this.playStatus = true);
         }
+    },
+    mounted() {
+        this.playStatus = true;
     },
     computed: {
         isEnd() {

@@ -6,9 +6,9 @@ import {
   memorySizeOf,
   isEmpty
 } from './utils'
-import node from './units/node'
-import mouse from './units/mouse'
-import browserWindow from './units/browserWindow'
+import node from './units/node.record'
+import mouse from './units/mouse.record'
+import browserWindow from './units/browserWindow.record'
 
 let ws,
   messageConfig = {
@@ -49,7 +49,7 @@ export async function init(_interval = 50) {
   interval = _interval
   recordStart = Date.now();
   pageCollection = pageCollector();
-  producers.forEach(val => val.record.init(takeRecord, interval))
+  producers.forEach(val => val.init(takeRecord, interval))
   ws.send(JSON.stringify({
     type: 'init',
     value: {
@@ -63,7 +63,7 @@ export async function init(_interval = 50) {
 }
 
 export function destroy() {
-  producers.forEach(val => val.record.destroy(interval))
+  producers.forEach(val => val.destroy(interval))
   status = false
 }
 

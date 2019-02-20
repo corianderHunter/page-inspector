@@ -1,6 +1,14 @@
 <template>
     <div class="website-list">
-        <el-table :data="list" style="width: 1000px;">
+        <h1 style="width: 1000px;margin:50px auto;">
+            浏览记录列表
+            <span style="font-size:14px;">(站点：{{website.origin}})</span>
+            <span
+                @click="$router.push('/websites')"
+                style="font-size:14px;margin-left:10px;cursor:pointer;"
+            >返回站点列表</span>
+        </h1>
+        <el-table :data="list" style="width: 1000px;margin:50px auto;   ">
             <el-table-column prop="path" label="路径" width="150"></el-table-column>
             <el-table-column prop="userAgent" label="用户标识" width="200"></el-table-column>
             <el-table-column prop="ip" label="IP"></el-table-column>
@@ -12,7 +20,12 @@
             </el-table-column>
             <el-table-column label="操作">
                 <template slot-scope="scope">
-                    <el-button @click="replay(scope.row)" type="text" size="small">回放</el-button>
+                    <el-button
+                        :disabled="!scope.row.max"
+                        @click="replay(scope.row)"
+                        type="text"
+                        size="small"
+                    >回放</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -23,7 +36,8 @@
 export default {
     data() {
         return {
-            list: []
+            list: [],
+            website: {}
         };
     },
     computed: {
@@ -32,16 +46,26 @@ export default {
         }
     },
     mounted() {
-        this.websiteId &&
-            this.$service
-                .getSessionsByWebsite({
-                    params: {
-                        websiteId: this.websiteId
-                    }
-                })
-                .then(data => {
-                    this.list = data;
-                });
+        if (!this.websiteId) return;
+        this.$service
+            .getSessionsByWebsite({
+                params: {
+                    websiteId: this.websiteId
+                }
+            })
+            .then(data => {
+                this.list = data;
+            });
+
+        this.$service
+            .getWebsite({
+                urlParams: {
+                    id: this.websiteId
+                }
+            })
+            .then(data => {
+                this.website = data;
+            });
     },
     methods: {
         replay(session) {

@@ -1,6 +1,7 @@
 <template>
     <div class="website-list">
-        <el-table :data="list" style="width: 1000px;">
+        <h1 style="width: 1000px;margin:50px auto;">站点列表</h1>
+        <el-table :data="list" style="width: 1000px;margin:50px auto;">
             <el-table-column prop="origin" label="站点" width="300"></el-table-column>
             <el-table-column prop="count" label="session数目" width="180"></el-table-column>
             <el-table-column prop="createdAt" label="首次访问时间"></el-table-column>

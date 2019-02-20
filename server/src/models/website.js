@@ -32,6 +32,9 @@ websiteSchema.statics = {
                 count: await Session.countByWebsite(website._id)
             }
         }))
+    },
+    async get(...args) {
+        return await this.findById(...args)
     }
 }
 

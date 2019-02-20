@@ -9,7 +9,7 @@ import {
   throttle
 } from '../utils'
 
-let self, interval = 30,
+let interval = 30,
   record;
 
 let scrollEvent;
@@ -48,21 +48,14 @@ function windowSizeObserverDestroy() {
 
 
 export default {
-  record: {
-    init(_record, _interval) {
-      record = _record;
-      interval = _interval
-      scrollObserverInit()
-      windowSizeObserverInit()
-    },
-    destroy() {
-      scrollObserverDestroy()
-      windowSizeObserverDestroy()
-    },
+  init(_record, _interval) {
+    record = _record;
+    interval = _interval
+    scrollObserverInit()
+    windowSizeObserverInit()
   },
-  replay(record, _self = window) {
-    self = _self
-    let _window = record.window;
-    _window && !isUndef(_window.sx) && !isUndef(_window.sy) && self.scrollTo(_window.sx, _window.sy)
-  }
+  destroy() {
+    scrollObserverDestroy()
+    windowSizeObserverDestroy()
+  },
 }

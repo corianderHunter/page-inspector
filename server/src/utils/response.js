@@ -60,7 +60,7 @@ module.exports = {
         let response = {};
 
         if (err) {
-            response.error = err;
+            response.error = err.body || err;
             response.status = err.status || 500;
             if (errMessage)
                 response.error.message = errMessage.message || errMessage;
