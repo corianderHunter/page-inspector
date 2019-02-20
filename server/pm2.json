@@ -1,5 +1,5 @@
 {
-    "name": "test-node",
+    "name": "node-pm2",
     "script": "npm",
     "args": "start",
     "instances": "1",
