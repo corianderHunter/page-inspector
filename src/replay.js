@@ -3,12 +3,12 @@ import {
 } from './utils'
 import {
     pageRender
-} from './page'
+} from './units/page.replay'
 import node from './units/node.replay'
 import mouse from './units/mouse.replay'
 import browserWindow from './units/browserWindow.replay'
 
-let self, records, domObj, interval, replayers;
+let self, records, page, interval, replayers;
 
 let consumers = [node, mouse, browserWindow]
 
@@ -17,12 +17,8 @@ function getReplayers() {
 }
 
 
-function init(_self, _dom, _records, _interval) {
-
-    self = _self
-    domObj = _dom
-    records = _records
-    interval = _interval
+function init(...args) {
+    [self, page, records, interval] = args
     if (!records || isEmpty(records)) return
     replayers = getReplayers()
     buildFuncMap()
@@ -44,7 +40,7 @@ function buildFuncMap() {
 
 function play(startPoint = 0, fresh) {
     stop();
-    fresh && pageRender(domObj, self)
+    fresh && pageRender(page, self)
     for (let [timePoint, timeFunc] of funcMap) {
         if (timePoint >= startPoint) {
             timerMap.set(timePoint - 0, self.setTimeout(() => {

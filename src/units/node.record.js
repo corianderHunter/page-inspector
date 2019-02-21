@@ -1,11 +1,13 @@
 import {
   domToPlainObject,
   watchInputNode,
-  throttle
+  throttle,
+  formatUrlAttribute,
+  formatUrlAttributes
 } from "../utils"
 import {
-  getDomMap
-} from '../record'
+  pageCollection
+} from './page.record'
 
 
 
@@ -17,7 +19,7 @@ let interval = 50, //the minimum time interval,
 
 //add all nodes(nodeType is Node.ELEMENT_NODE=1) into a Map for record,
 function initNodesRecordMap() {
-  nodesMap_record = getDomMap()
+  nodesMap_record = pageCollection.domMap;
   nodesIdx_record = nodesMap_record.size;
 }
 
@@ -53,7 +55,7 @@ function nodeMutationCollector(mutation) {
       record({
         type,
         attributeName: mutation.attributeName,
-        newValue: mutation.target.getAttribute(mutation.attributeName),
+        newValue: formatUrlAttribute(mutation.attributeName, mutation.target.getAttribute(mutation.attributeName)),
         id
       }, recordType)
       break;
@@ -81,6 +83,7 @@ function nodeMutationCollector(mutation) {
         nodesMap_record.set(val, ++nodesIdx_record)
         //transform node to object ,and set it and its childNodes into nodesMap_record
         return domToPlainObject(val, (obj, node) => {
+          obj.attributes && formatUrlAttributes(obj.attributes)
           obj['id'] = ++nodesIdx_record
           nodesMap_record.set(node, nodesIdx_record)
         })

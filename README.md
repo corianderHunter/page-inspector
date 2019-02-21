@@ -14,7 +14,7 @@
 
 - Configure your .env file in `./server`(as your need)
 - create folder `/db/mongo` in `./server ` for data storage of the mongo db 
-- build docker image for node service 
+- build docker image for node service（only need build once）
     ```
         cd server&&docker build -t node-pm2 .
     ```

@@ -482,6 +482,23 @@ function formatUrlAttributes(attrs) {
   })
 }
 
+function formatUrlAttribute(attr, value) {
+  if (!attr || !value) return value;
+  if (networkAttributes.includes(attr)) {
+    if (value && !urlIsAbsolute(value)) {
+      try {
+        console.log(value, attr, (new URL(value, window.location.origin)).href)
+        return (new URL(value, window.location.origin)).href
+      } catch (e) {
+        console.error(e)
+      }
+
+    }
+
+  }
+  return value
+}
+
 export {
   isBrowser,
   isNode,
@@ -504,5 +521,6 @@ export {
   throttle,
   memorySizeOf,
   nodeRemove,
-  formatUrlAttributes
+  formatUrlAttributes,
+  formatUrlAttribute
 };

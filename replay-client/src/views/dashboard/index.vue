@@ -1,7 +1,9 @@
 <template>
     <div class="dashboard">
         <div class="bg-mask"></div>
-        <iframe ref="replayIframe" scrolling="no"></iframe>
+        <div class="iframe-div">
+            <iframe ref="replayIframe" scrolling="no"></iframe>
+        </div>
         <div class="page-source">
             From：
             <a :href="url" target="_blank">{{url||'---'}}</a>
@@ -139,15 +141,18 @@ export default {
         filter: blur(7px);
         z-index: 66;
     }
-    iframe {
+    .iframe-div {
         position: absolute;
         left: 20px;
         top: 20px;
         width: calc(100% - 40px);
         height: calc(100% - 70px);
-        background-color: #fff;
-        border: none;
+        background-image: url(/static/images/subtlepatterns-white_texture.png);
         z-index: 77;
+        iframe {
+            border: none;
+            background-color: #fff;
+        }
     }
     .page-source {
         position: fixed;

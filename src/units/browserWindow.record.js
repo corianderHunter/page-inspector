@@ -5,7 +5,6 @@
 import {
   globalEventBind,
   globalEventUnBind,
-  isUndef,
   throttle
 } from '../utils'
 

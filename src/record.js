@@ -1,14 +1,14 @@
 import initWs from './ws'
 import {
-  pageCollector
-} from './page'
-import {
   memorySizeOf,
   isEmpty
 } from './utils'
 import node from './units/node.record'
 import mouse from './units/mouse.record'
 import browserWindow from './units/browserWindow.record'
+import {
+  pageCollector
+} from './units/page.record'
 
 let ws,
   messageConfig = {
@@ -57,7 +57,10 @@ export async function init(_interval = 50) {
       userAgent: window.navigator.userAgent,
       origin: window.location.origin,
       path: window.location.pathname,
-      page: getDomObject(),
+      page: {
+        dom: pageCollection.domObject,
+        size: pageCollection.size
+      },
     }
   }))
 }
@@ -65,18 +68,6 @@ export async function init(_interval = 50) {
 export function destroy() {
   producers.forEach(val => val.destroy(interval))
   status = false
-}
-
-export function getDomObject() {
-  if (!status)
-    return console.warn('recorder is not inited')
-  return pageCollection.domObject
-}
-
-export function getDomMap() {
-  if (!status)
-    return console.warn('recorder is not inited')
-  return pageCollection.domMap
 }
 
 export function getRecords() {
@@ -119,6 +110,5 @@ export default {
   init,
   status,
   destroy,
-  getDomObject,
   getRecords
 }

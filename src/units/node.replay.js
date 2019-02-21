@@ -6,7 +6,7 @@ import {
 
 import {
   getNodesMap
-} from '../page'
+} from './page.replay'
 
 let self,
   recordType = 'nodes';
