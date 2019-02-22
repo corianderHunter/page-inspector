@@ -29,6 +29,15 @@
                 </template>
             </el-table-column>
         </el-table>
+        <el-pagination
+            style="width: 1000px;margin:20px auto;text-align:right;"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page.sync="pager.page"
+            :page-size="pager.pageSize"
+            layout="total, prev, pager, next"
+            :total="total"
+        ></el-pagination>
     </div>
 </template>
 
@@ -37,6 +46,11 @@ export default {
     data() {
         return {
             list: [],
+            pager: {
+                page: 1,
+                pageSize: 10
+            },
+            total: 0,
             website: {}
         };
     },
@@ -47,16 +61,7 @@ export default {
     },
     mounted() {
         if (!this.websiteId) return;
-        this.$service
-            .getSessionsByWebsite({
-                params: {
-                    websiteId: this.websiteId
-                }
-            })
-            .then(data => {
-                this.list = data;
-            });
-
+        this.fetchList();
         this.$service
             .getWebsite({
                 urlParams: {
@@ -68,6 +73,27 @@ export default {
             });
     },
     methods: {
+        fetchList() {
+            this.$service
+                .getSessionsByWebsite({
+                    params: {
+                        websiteId: this.websiteId,
+                        ...this.pager
+                    }
+                })
+                .then(data => {
+                    this.list = data.list;
+                    this.total = data.count;
+                });
+        },
+        handleSizeChange(val) {
+            this.pager.pageSize = val - 0;
+            this.fetchList();
+        },
+        handleCurrentChange(val) {
+            this.pager.page = val - 0;
+            this.fetchList();
+        },
         replay(session) {
             this.$router.push({
                 name: "dashboard",

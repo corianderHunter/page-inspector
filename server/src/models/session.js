@@ -36,6 +36,9 @@ sessionSchema.statics = {
     async list(...args) {
         return await this.find(...args)
     },
+    async count(...args) {
+        return await this.countDocuments(...args)
+    },
     async get(...args) {
         return await this.findOne(...args)
     },

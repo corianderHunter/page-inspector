@@ -24,7 +24,7 @@
 <script>
 import playTools from "./playTools";
 import fetch from "@utils/fetch";
-import replay from "@/../../dist/page-replay";
+import replay from "@/../../src/replay";
 
 export default {
     replayIframe: null,

@@ -20,8 +20,24 @@ router.get('*', (req, res, next) => {
 
 router.get('/websites', (req, res) => {
     mongooseAction(async () => {
-        let list = await Website.list()
-        json(res, list)
+        let {
+            page = 1,
+                pageSize = 10
+        } = req.query
+        let list = await Website.list(null, null, {
+            skip: (page - 1) * pageSize,
+            limit: pageSize - 0,
+            sort: {
+                _id: -1
+            }
+        })
+        let count = await Website.count()
+        json(res, {
+            list,
+            count,
+            page,
+            pageSize
+        })
     }, res)
 })
 
@@ -56,12 +72,28 @@ router.route('/sessions')
     .get((req, res) => {
         mongooseAction(async () => {
             let {
-                websiteId
+                websiteId,
+                page = 1,
+                pageSize = 10
             } = req.query
             let list = await Session.list({
                 websiteId
-            }, '-page')
-            json(res, list)
+            }, '-page', {
+                skip: (page - 1) * pageSize,
+                limit: pageSize - 0,
+                sort: {
+                    _id: 1
+                }
+            })
+            let count = await Session.count({
+                websiteId
+            })
+            json(res, {
+                list,
+                count,
+                page,
+                pageSize
+            })
         }, res)
     })
     .delete((req, res) => {

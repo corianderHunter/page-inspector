@@ -33,6 +33,9 @@ websiteSchema.statics = {
             }
         }))
     },
+    async count(...args) {
+        return await this.countDocuments(...args)
+    },
     async get(...args) {
         return await this.findById(...args)
     }

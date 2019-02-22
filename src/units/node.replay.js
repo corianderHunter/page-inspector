@@ -17,7 +17,12 @@ function recordReplay(data) {
   if (isUndef(target)) return;
   switch (data.type) {
     case 'attributes':
-      target.setAttribute(data.attributeName, data.newValue)
+      if (target.tagName === 'A' && data.attributeName === 'href') {
+        target.setAttribute('_href', data.newValue)
+      } else {
+        target.setAttribute(data.attributeName, data.newValue)
+      }
+
       break;
     case 'characterData':
       target.data = data.newValue

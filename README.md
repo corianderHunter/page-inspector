@@ -9,7 +9,7 @@
     ```
         npm run build
     ```
-
+- put `/dist/page-replay.min.js` in your we-bpage to record the visit of website
 ### server
 
 - Configure your .env file in `./server`(as your need)

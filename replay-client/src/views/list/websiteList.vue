@@ -12,6 +12,15 @@
                 </template>
             </el-table-column>
         </el-table>
+        <el-pagination
+            style="width: 1000px;margin:20px auto;text-align:right;"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page.sync="pager.page"
+            :page-size="pager.pageSize"
+            layout="total, prev, pager, next"
+            :total="total"
+        ></el-pagination>
     </div>
 </template>
 
@@ -19,15 +28,36 @@
 export default {
     data() {
         return {
-            list: []
+            list: [],
+            total: 0,
+            pager: {
+                page: 1,
+                pageSize: 10
+            }
         };
     },
     mounted() {
-        this.$service.getWebsites().then(data => {
-            this.list = data;
-        });
+        this.fetchList();
     },
     methods: {
+        fetchList() {
+            this.$service
+                .getWebsites({
+                    params: this.pager
+                })
+                .then(data => {
+                    this.list = data.list;
+                    this.total = data.count;
+                });
+        },
+        handleSizeChange(val) {
+            this.pager.pageSize = val - 0;
+            this.fetchList();
+        },
+        handleCurrentChange(val) {
+            this.pager.page = val - 0;
+            this.fetchList();
+        },
         detail(website) {
             this.$router.push({
                 name: "sessionList",

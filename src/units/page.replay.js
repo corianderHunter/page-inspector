@@ -33,7 +33,7 @@ export function pageRender(page, self) {
     _root.style.bottom = 0
     let scaleW = cWidth / size.width;
     let scaleH = cHeight / size.height;
-    if (scaleH < 1 && scaleW < 1) {
+    if (scaleH < 1 || scaleW < 1) {
         let scale = scaleH > scaleW ? scaleW : scaleH;
         _root.style.transform = `scale(${scale})`
     }
