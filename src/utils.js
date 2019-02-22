@@ -188,6 +188,10 @@ function plainObjectToDom(obj, self = window, callback = () => {}) {
           for (let pro in obj.attributes) {
             _node.setAttribute(pro, obj.attributes[pro])
           }
+          if (obj.tagName.toUpperCase() === 'A') {
+            _node.removeAttribute('href')
+            obj.attributes['href'] && _node.setAttribute('_href', obj.attributes['href'])
+          }
         }
         obj.childNodes && obj.childNodes.forEach(val => {
           let _dom = plainObjectToDom(val, self, callback)
