@@ -15,6 +15,7 @@ let connect = () => {
 let initServer = () => {
     require('./models/session')
     require('./models/website')
+    require('./models/canvasImage')
     const express = require('express');
     const routers = require('./routes');
     const bodyParser = require('body-parser')

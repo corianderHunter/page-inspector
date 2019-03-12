@@ -1,7 +1,10 @@
-const mongoose = require('mongoose');
+const fs = require('fs')
 
-let express = require('express');
-let router = express.Router();
+const mongoose = require('mongoose');
+const express = require('express');
+const router = express.Router();
+const multipart = require('connect-multiparty');
+const multipartMiddle = multipart()
 
 const {
     json
@@ -12,6 +15,7 @@ const {
 
 const Website = mongoose.model('Website');
 const Session = mongoose.model('Session');
+const CanvasImage = mongoose.model('CanvasImage');
 const getRecordModel = require('./models/record');
 
 router.get('*', (req, res, next) => {
@@ -172,5 +176,25 @@ router.route('/record/:websiteId/:id')
             json(res, record)
         })
     })
+
+
+router.post('/canvasBlob', multipartMiddle, (req, res, next) => {
+    new CanvasImage({
+        data: fs.readFileSync(req.files.data.path)
+    }).save().then(image => {
+        res.end(image.data, 'binary')
+    })
+})
+
+router.post('/canvas/:id', (req, res, next) => {
+    let {
+        id
+    } = req.params
+    CanvasImage.get({
+        _id: id
+    })
+    res.send(req.body)
+})
+
 
 module.exports = router;

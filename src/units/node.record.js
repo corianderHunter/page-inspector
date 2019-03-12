@@ -89,20 +89,10 @@ function nodeMutationCollector(mutation) {
         })
       })
       let prevNode, nextNode
-      if (mutation.previousSibling) {
-        if (mutation.previousSibling.nodeType === 1) {
-          prevNode = nodesMap_record.get(mutation.previousSibling)
-        } else {
-          prevNode = nodesMap_record.get(mutation.previousSibling.previousElementSibling)
-        }
-      }
-      if (mutation.nextSibling) {
-        if (mutation.nextSibling.nodeType === 1) {
-          nextNode = nodesMap_record.get(mutation.nextSibling)
-        } else {
-          nextNode = nodesMap_record.get(mutation.nextSibling.nextElementSibling)
-        }
-      }
+      if (mutation.previousSibling) 
+        (prevNode = nodesMap_record.get(mutation.previousSibling))||(prevNode = nodesMap_record.get(mutation.previousSibling.previousElementSibling))
+      if (mutation.nextSibling) 
+        (nextNode = nodesMap_record.get(mutation.nextSibling))||(nextNode = nodesMap_record.get(mutation.nextSibling.previousElementSibling))
       record({
         type,
         id,
