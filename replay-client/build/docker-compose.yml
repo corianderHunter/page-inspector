@@ -1,0 +1,11 @@
+version: '3.1'
+
+services:
+    nginx-common:
+        container_name: nginx-common
+        image: nginx
+        restart: always
+        volumes:
+            - ./nginx-dev.conf:/etc/nginx/nginx.conf
+        ports:
+            - 8090:80

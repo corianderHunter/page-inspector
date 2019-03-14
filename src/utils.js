@@ -164,7 +164,11 @@ function domToPlainObject(node, format = () => {}) {
       }
       break
     default:
-      plainObject.textContent = node.textContent
+      if(node.parentElement){
+        plainObject.textContent = node.parentElement.tagName === 'STYLE'?handleStyleUrl(node.textContent):node.textContent
+      }else{
+        plainObject.textContent = node.textContent
+      }
       break
   }
   format(plainObject, node)
@@ -214,6 +218,12 @@ function plainObjectToDom(obj, self = window, callback = () => {}) {
   }
   callback(obj, _node)
   return _node;
+}
+
+
+// format the url(*) in <style>
+function handleStyleUrl(content){
+  return content.replace(/url\("?(.*?)"?\)/g,`url(/proxy?target=${(new URL('$1',window.location.origin)).href})`)
 }
 
 //watch all of the input value change caused by js code

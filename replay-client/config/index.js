@@ -19,6 +19,9 @@ module.exports = {
           '^/api': ''
         }
       },
+      '/proxy':{
+        target:JSON.parse(devEnv.RESOURCE_PROXY)
+      }
     },
 
     // Various Dev Server settings

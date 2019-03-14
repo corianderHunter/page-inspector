@@ -4,6 +4,7 @@ const webpack = require('webpack')
 const config = require('../config')
 const merge = require('webpack-merge')
 const path = require('path')
+const child_process = require('child_process')
 const baseWebpackConfig = require('./webpack.base.conf')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -12,6 +13,18 @@ const portfinder = require('portfinder')
 
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
+
+const docker_process = child_process.exec('docker-compose up',{
+  cwd:path.join(__filename,'../')
+},(err,stdout,stderr)=>{
+  console.error('docker:err',err)
+  console.error('docker:stderr',stderr)
+})
+
+process.on('exit',(code)=>{
+    child_process.exec('docker stop nginx-common')&&console.info('\nNginx proxy service stopped...')
+})
+
 
 const devWebpackConfig = merge(baseWebpackConfig, {
   module: {
