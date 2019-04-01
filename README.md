@@ -1,7 +1,6 @@
-# page-inspector
+# page-inspector  [![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 
 > record the every visit of your website , and then replay.
-[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
 
 ### js library for recording and replay
 
