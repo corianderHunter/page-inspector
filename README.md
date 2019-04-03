@@ -28,5 +28,5 @@
 - Configure in ./config/*.env.js as your need
 - init service
     ```
-        npm run dev
+       cd replay-client&&npm run dev
     ```
