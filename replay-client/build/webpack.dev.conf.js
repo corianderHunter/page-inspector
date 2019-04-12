@@ -14,16 +14,16 @@ const portfinder = require('portfinder')
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
 
-const docker_process = child_process.exec('docker-compose up',{
-  cwd:path.join(__filename,'../')
-},(err,stdout,stderr)=>{
-  console.error('docker:err',err)
-  console.error('docker:stderr',stderr)
-})
+// const docker_process = child_process.exec('docker-compose up',{
+//   cwd:path.join(__filename,'../')
+// },(err,stdout,stderr)=>{
+//   console.error('docker:err',err)
+//   console.error('docker:stderr',stderr)
+// })
 
-process.on('exit',(code)=>{
-    child_process.exec('docker stop nginx-common')&&console.info('\nNginx proxy service stopped...')
-})
+// process.on('exit',(code)=>{
+//     child_process.exec('docker stop nginx-common')&&console.info('\nNginx proxy service stopped...')
+// })
 
 
 const devWebpackConfig = merge(baseWebpackConfig, {

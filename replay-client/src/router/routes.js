@@ -9,6 +9,8 @@ export default [{
   path: '/',
   name: 'main-container',
   component: mainContainer,
+  redirect: '/websites',
+  
 }, {
   path: '/dashboard/:websiteId/:sessionId',
   name: 'dashboard',

@@ -19,8 +19,8 @@ module.exports = {
           '^/api': ''
         }
       },
-      '/proxy':{
-        target:JSON.parse(devEnv.RESOURCE_PROXY)
+      '/proxy': {
+        target: JSON.parse(devEnv.RESOURCE_PROXY)
       }
     },
 
