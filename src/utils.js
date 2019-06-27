@@ -420,28 +420,6 @@ function memorySizeOf(obj, format = 'KB') {
 }
 /** memorySizeOf*/
 
-//under risk
-let globalOldEvents = {};
-//under risk
-function globalEventBind(eventName, callback) {
-  globalOldEvents[eventName] = window[eventName];
-  window[eventName] = (e) => {
-    typeof globalOldEvents[eventName] === 'function' ? globalOldEvents[eventName].call(null, e) : null;
-    callback.call(null, e)
-  }
-}
-//under risk
-function globalEventUnBind(eventName) {
-  if (eventName !== undefined) {
-    window[eventName] = globalOldEvents[eventName]
-  } else {
-    for (let pro in globalOldEvents) {
-      window[pro] = globalOldEvents[pro]
-    }
-  }
-
-}
-
 function isUndef(v) {
   return v === undefined || v === null
 }
@@ -520,8 +498,6 @@ export {
   detectOS,
   getNodeVersion,
   parseUserAgent,
-  globalEventBind,
-  globalEventUnBind,
   isUndef,
   isObject,
   isPlainObject,

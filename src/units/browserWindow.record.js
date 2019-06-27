@@ -3,15 +3,13 @@
  */
 
 import {
-  globalEventBind,
-  globalEventUnBind,
   throttle
 } from '../utils'
 
 let interval = 30,
   record;
 
-let scrollEvent;
+let scrollEvent,resizeEvent;
 
 function scrollObserverInit() {
   window.addEventListener('scroll', scrollEvent = throttle(interval, (e) => {
@@ -30,8 +28,7 @@ function scrollObserverDestroy() {
 }
 
 function windowSizeObserverInit() {
-  //it my be overwrite
-  globalEventBind('onresize', throttle(interval, () => {
+  window.addEventListener('resize', resizeEvent = throttle(interval, () => {
     record({
       window: {
         w: window.innerWidth,
@@ -42,7 +39,7 @@ function windowSizeObserverInit() {
 }
 
 function windowSizeObserverDestroy() {
-  globalEventUnBind('onresize')
+  window.removeEventListener('resize', resizeEvent)
 }
 
 
