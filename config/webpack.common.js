@@ -7,7 +7,9 @@ module.exports = {
     rules: [
       {
         test: /\.(ts|tsx)?$/,
-        use: 'ts-loader',
+        use: [
+          { loader: 'ts-loader', options: { onlyCompileBundledFiles: true } }
+        ],
         include: [
           path.resolve(__dirname, '..', 'src'),
           path.resolve(__dirname, '..', 'test')

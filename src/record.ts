@@ -1,5 +1,4 @@
 import initWs from './ws';
-import { memorySizeOf, isEmpty } from './utils';
 import node from './units/node.record';
 import mouse from './units/mouse.record';
 import browserWindow from './units/browserWindow.record';
@@ -7,10 +6,10 @@ import { pageCollector } from './units/page.record';
 
 let ws: WebSocket;
 
-let records = {},
+let records: object = {},
   recordStart: number,
   interval: number,
-  status: number,
+  status: boolean,
   pageCollection;
 
 let producers = [node, mouse, browserWindow];
