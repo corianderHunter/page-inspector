@@ -5,15 +5,15 @@ import mouse from './units/mouse.record';
 import browserWindow from './units/browserWindow.record';
 import { pageCollector } from './units/page.record';
 
-let ws;
-
-let producers = [node, mouse, browserWindow];
+let ws: WebSocket;
 
 let records = {},
-  recordStart,
-  interval,
-  status,
+  recordStart: number,
+  interval: number,
+  status: number,
   pageCollection;
+
+let producers = [node, mouse, browserWindow];
 
 function takeRecord(data, prop) {
   let timeKey = Math.floor((Date.now() - recordStart) / interval);
