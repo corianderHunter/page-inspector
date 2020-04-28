@@ -1,14 +1,25 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "lib": ["es2015", "es2017", "dom"],
     "sourceMap": true,
-    "noImplicitAny": true,
-    "module": "commonjs",
+    "moduleResolution": "node",
     "target": "es5",
-    "jsx": "react",
-    "lib": ["es6", "dom"],
-    "allowJs": true
+    "module": "esnext",
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "outDir": "./dist/types",
+    "declaration": true,
+    "downlevelIteration": true
   },
-  "exclude": ["node_modules", "dist"],
-  "include": ["src/*.ts", "src/*.tsx", "test/*.ts", "test/*.tsx"]
+  "exclude": ["node_modules"],
+  "include": ["**/*.ts", "**/*.tsx"]
 }

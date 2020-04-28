@@ -6,7 +6,7 @@
   "sideEffects": false,
   "scripts": {
     "dev": "webpack --config config/webpack.dev.js",
-    "build": "node -r dotenv/config webpack.config.js",
+    "build": "webpack --config config/webpack.prod.js",
     "test": "webpack --config config/webpack.test.js"
   },
   "author": "corianderHunter",
@@ -22,7 +22,8 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "underscore": "^1.9.1",
-    "axios": "^0.18.0"
+    "@types/node": "^12.7.7",
+    "axios": "^0.18.0",
+    "underscore": "^1.9.1"
   }
 }

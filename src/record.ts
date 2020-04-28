@@ -1,20 +1,63 @@
-import initWs from './ws';
-import node from './units/node.record';
-import mouse from './units/mouse.record';
-import browserWindow from './units/browserWindow.record';
-import { pageCollector } from './units/page.record';
+import initWs from "./ws";
+import node from "./units/node.record";
+import mouse from "./units/mouse.record";
+import browserWindow from "./units/browserWindow.record";
+import { pageCollector } from "./units/page.record";
+import memorySizeOf from "./helper/memorySizeOf";
+import { isEmpty } from "./helper/is";
+import { isBrowser } from "./helper/environment";
 
-let ws: WebSocket;
+if (!isBrowser) {
+  throw new Error("page-inspector-record can only be used in browser side!");
+}
 
-let records: object = {},
+let ws: WebSocket | null;
+
+let records: Records,
   recordStart: number,
   interval: number,
   status: boolean,
+  intervalTimer: number,
   pageCollection;
 
-let producers = [node, mouse, browserWindow];
+const producers = [node, mouse, browserWindow];
 
-function takeRecord(data, prop) {
+document.addEventListener("load", () => {
+  window.setTimeout(init, 500);
+});
+
+/**
+ *
+ * @param _interval use this to generate timeKey
+ */
+export const init = async (_interval = 50) => {
+  ws = await initWs();
+  if (!ws) return console.info("websocket init failed!");
+  globalWsFunc();
+  status = true;
+  interval = _interval;
+  recordStart = Date.now();
+  pageCollection = pageCollector();
+  producers.forEach((val) => val.init(takeRecord, interval));
+  console.info("page-inspector-record has inited!!!");
+  ws.send(
+    JSON.stringify({
+      type: "init",
+      value: {
+        interval,
+        userAgent: window.navigator.userAgent,
+        origin: window.location.origin,
+        path: window.location.pathname,
+        page: {
+          dom: pageCollection.domObject,
+          size: pageCollection.size,
+        },
+      },
+    })
+  );
+};
+
+const takeRecord: RecordTakeEvent = (data, prop) => {
   let timeKey = Math.floor((Date.now() - recordStart) / interval);
   if (!records[timeKey]) records[timeKey] = {};
   if (prop) {
@@ -23,51 +66,24 @@ function takeRecord(data, prop) {
   } else {
     records[timeKey] = {
       ...records[timeKey],
-      ...data
+      ...data,
     };
   }
-}
-
-export async function init(_interval = 50) {
-  ws = await initWs();
-  if (!ws) return console.error('websocket init failed!');
-  globalWsFunc();
-  status = true;
-  interval = _interval;
-  recordStart = Date.now();
-  pageCollection = pageCollector();
-  producers.forEach(val => val.init(takeRecord, interval));
-  ws.send(
-    JSON.stringify({
-      type: 'init',
-      value: {
-        interval,
-        userAgent: window.navigator.userAgent,
-        origin: window.location.origin,
-        path: window.location.pathname,
-        page: {
-          dom: pageCollection.domObject,
-          size: pageCollection.size
-        }
-      }
-    })
-  );
-}
+};
 
 export function destroy() {
-  producers.forEach(val => val.destroy(interval));
+  producers.forEach((val) => val.destroy(interval));
   status = false;
+  clearInterval(intervalTimer);
 }
 
 export function getRecords() {
-  if (!status) return console.warn('recorder is not inited');
+  if (!status) return console.warn("recorder is not inited");
   return records;
 }
 
-window.setTimeout(init, 300);
-
 function globalWsFunc() {
-  window.setInterval(() => {
+  intervalTimer = window.setInterval(() => {
     if (memorySizeOf(records) > 1024) {
       wsRecordsSend();
     }
@@ -79,26 +95,26 @@ function globalWsFunc() {
 }
 
 function wsRecordsSend() {
-  if (isEmpty(records)) return;
+  if (isEmpty(records) || !ws) return;
   try {
     let timeKey = Math.floor((Date.now() - recordStart) / interval);
     ws.send(
       JSON.stringify({
         value: {
           records,
-          timeKey
-        }
+          timeKey,
+        },
       })
     );
+    records = {};
   } catch (e) {
     console.error(e);
   }
-  records = {};
 }
 
 export default {
   init,
   status,
   destroy,
-  getRecords
+  getRecords,
 };

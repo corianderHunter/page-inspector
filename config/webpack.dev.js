@@ -1,7 +1,6 @@
 const merge = require('webpack-merge');
 const common = require('./webpack.common.js');
 const path = require('path');
-const Dotenv = require('dotenv-webpack');
 // const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = merge(common, {
@@ -13,7 +12,7 @@ module.exports = merge(common, {
   },
   mode: 'development',
   devtool: 'source-map',
-  plugins: [new Dotenv()],
+
   output: {
     filename: '[name].js',
     libraryTarget: 'umd',

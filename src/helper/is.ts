@@ -1,22 +1,22 @@
-export function isUndef(v: any) {
+export const isUndef = (v: any) => {
   return v === undefined || v === null;
-}
+};
 
-export function isObject(obj: any) {
-  return obj !== null && typeof obj === 'object';
-}
+export const isObject = (obj: any) => {
+  return obj !== null && typeof obj === "object";
+};
 
-export function isPlainObject(obj: any) {
-  return Object.prototype.toString.call(obj) === '[object Object]';
-}
+export const isPlainObject = (obj: any) => {
+  return Object.prototype.toString.call(obj) === "[object Object]";
+};
 
-export function isRegExp(v: any) {
-  return Object.prototype.toString.call(v) === '[object RegExp]';
-}
+export const isRegExp = (v: any) => {
+  return Object.prototype.toString.call(v) === "[object RegExp]";
+};
 
-export function isFunction(v: any) {
-  return typeof v === 'function' || false;
-}
+export const isFunction = (v: any) => {
+  return Object.prototype.toString.call(v) === "[object Function]";
+};
 
 export function isEmpty(obj: any) {
   if (obj == null) return true;

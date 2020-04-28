@@ -1,7 +1,12 @@
 /**
  * code from 'https://github.com/niksy/throttle-debounce/blob/master/throttle.js'
  */
-export default function throttle(delay, noTrailing, callback, debounceMode) {
+export default function throttle(
+  delay,
+  noTrailing,
+  callback = undefined,
+  debounceMode = undefined
+) {
   /*
    * After wrapper has stopped being called, this timeout ensures that
    * `callback` is executed at the proper times in `throttle` and `end`

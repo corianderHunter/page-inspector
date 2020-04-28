@@ -1,12 +1,6 @@
-/**
- * mouse
- */
-import {
-  throttle
-} from '../utils'
+import throttle from '../helper/throttle';
 
-let interval,
-  record
+let interval, record: RecordTakeEvent;
 
 let mouseMove = throttle(interval, e => {
   record({
@@ -36,8 +30,6 @@ function unmount() {
   document.documentElement.removeEventListener('mousedown', mouseDown, false);
 }
 
-
-
 export default {
   init(_record, _interval = 50) {
     record = _record;
@@ -47,4 +39,4 @@ export default {
   destroy() {
     unmount();
   }
-}
+};

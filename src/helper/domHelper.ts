@@ -1,4 +1,4 @@
-import { isPlainObject, isAbsoluteUrl } from './is';
+import { isPlainObject, isAbsoluteUrl } from "./is";
 
 export type DomObject = {
   id?: number;
@@ -13,7 +13,7 @@ export type DomObject = {
 
 export type NodeType = Element | Text | Comment;
 
-const NETWORKATTRIBUTES = ['src', 'href'];
+const NETWORKATTRIBUTES = ["src", "href"];
 
 export function domToPlainObject(
   node: Element,
@@ -29,7 +29,7 @@ export function domToPlainObject(
    */
 
   let plainObject = {
-    nodeType: node.nodeType
+    nodeType: node.nodeType,
   } as DomObject;
   switch (node.nodeType) {
     case 1:
@@ -45,7 +45,7 @@ export function domToPlainObject(
         }
       }
       if (node.childNodes && node.childNodes.length) {
-        plainObject.childNodes = [...(node.childNodes as any)].map(val =>
+        plainObject.childNodes = [...(node.childNodes as any)].map((val) =>
           domToPlainObject(val as Element, format)
         );
       }
@@ -53,7 +53,7 @@ export function domToPlainObject(
     default:
       if (node.parentElement) {
         plainObject.textContent =
-          node.parentElement.tagName === 'STYLE'
+          node.parentElement.tagName === "STYLE"
             ? handleStyleUrl(node.textContent)
             : node.textContent;
       } else {
@@ -76,8 +76,8 @@ export function plainObjectToDom(
     switch (obj.nodeType) {
       case 1:
       case 9:
-        if (obj.tagName.toUpperCase() === 'SCRIPT') {
-          _node = self.document.createElement('NO-SCRIPT');
+        if (obj.tagName.toUpperCase() === "SCRIPT") {
+          _node = self.document.createElement("NO-SCRIPT");
         } else {
           _node = self.document.createElement(obj.tagName);
         }
@@ -86,14 +86,14 @@ export function plainObjectToDom(
           for (let pro in obj.attributes) {
             _node.setAttribute(pro, obj.attributes[pro]);
           }
-          if (obj.tagName.toUpperCase() === 'A') {
-            _node.removeAttribute('href');
-            obj.attributes['href'] &&
-              _node.setAttribute('_href', obj.attributes['href']);
+          if (obj.tagName.toUpperCase() === "A") {
+            _node.removeAttribute("href");
+            obj.attributes["href"] &&
+              _node.setAttribute("_href", obj.attributes["href"]);
           }
         }
         obj.childNodes &&
-          obj.childNodes.forEach(val => {
+          obj.childNodes.forEach((val) => {
             let _dom = plainObjectToDom(val, self, callback);
             _dom && _node.appendChild(_dom);
           });
@@ -125,13 +125,13 @@ export function nodeRemove(node: Element) {
 function handleStyleUrl(content: string) {
   return content.replace(
     /url\("?(.*?)"?\)/g,
-    `url(/proxy?target=${new URL('$1', window.location.origin).href})`
+    `url(/proxy?target=${new URL("$1", window.location.origin).href})`
   );
 }
 
 export function formatUrlAttributes(attrs: { [key: string]: any }) {
   if (!attrs) return;
-  NETWORKATTRIBUTES.forEach(val => {
+  NETWORKATTRIBUTES.forEach((val) => {
     if (attrs[val] && !isAbsoluteUrl(attrs[val])) {
       try {
         attrs[val] = new URL(attrs[val], window.location.origin).href;
@@ -141,4 +141,47 @@ export function formatUrlAttributes(attrs: { [key: string]: any }) {
       }
     }
   });
+}
+
+//watch all of the input value change caused by js code
+export function watchInputNode(callback) {
+  function collectAndCheck() {
+    tagNames.forEach((tagName) => {
+      nodes = [...nodes, ...[document.getElementsByTagName(tagName) as any]];
+    });
+    let newMap = new Map();
+    nodes.forEach((node) => {
+      newMap.set(node, node.value || "");
+      let _value = cacheMap.get(node);
+      if (_value !== undefined) {
+        _value === node.value ? null : callback(node);
+      }
+    });
+    cacheMap = newMap;
+  }
+  let tagNames = ["INPUT", "TEXTAREA", "SELECT"],
+    nodes = [],
+    cacheMap = new Map();
+  collectAndCheck();
+  let _timer = setInterval(function () {
+    collectAndCheck();
+  }, 300);
+  return function () {
+    clearInterval(_timer);
+  };
+}
+
+export function formatUrlAttribute(attr: string, value: string) {
+  if (!attr || !value) return value;
+  if (NETWORKATTRIBUTES.includes(attr)) {
+    if (value && !isAbsoluteUrl(value)) {
+      try {
+        console.log(value, attr, new URL(value, window.location.origin).href);
+        return new URL(value, window.location.origin).href;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }
+  return value;
 }

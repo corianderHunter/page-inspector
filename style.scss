@@ -1,0 +1,38 @@
+.report-prescription-detail {
+  .mode-range {
+    width: 300px !important;
+  }
+  .project-selection {
+    width: 120px;
+  }
+  .module-title {
+    font-size: 16px;
+    height: 24px;
+    line-height: 20px;
+
+    span {
+      margin-left: 10px;
+      vertical-align: text-bottom;
+      line-height: 24px;
+    }
+
+  }
+  .detail-list {
+    margin-top: 10px;
+    .ant-table {
+      overflow-x: auto;
+    }
+    .ant-table-body {
+      width: 130%;
+    }
+  }
+
+  .ant-tabs .ant-tabs-top-content > .ant-tabs-tabpane, .ant-tabs .ant-tabs-bottom-content > .ant-tabs-tabpane {
+    transition: none;
+  }
+
+}
+
+.time-diff{
+  color: #2494E1;
+}
